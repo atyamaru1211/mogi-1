@@ -1,0 +1,242 @@
+.item-detail {
+    display: flex;
+    padding: 20px;
+    gap: 50px;
+}
+
+.item-detail__left {
+    flex-shrink: 0;
+    width: 50%;
+}
+
+.item-img {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 4px;
+}
+
+.item-img img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.item-detail__right {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.item-detail__name {
+    margin: 0;
+}
+
+.item-detail__brand {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 12px;
+}
+
+.item-detail__price {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.price-amount {
+    margin-right: 5px;
+    font-size: 25px;
+}
+
+.price-tax {
+    font-weight: normal;
+}
+
+.item-detail__actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.like-button,
+.comment-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 8px 12px;
+}
+
+.like-button__icon,
+.comment-button__icon {
+    width: 20px;
+    height: 20px;
+}
+
+.purchase-button {
+    padding: 5px 12px;
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+    color: #FFFFFF;
+    background-color: #FF5555;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.item-detail__description {
+    margin-bottom: 10px;
+}
+
+.description-title {
+    margin-bottom: 15px;
+}
+
+.description-text {
+    margin-bottom: 10px;
+}
+
+.item-detail__attributes {
+    margin-bottom: 10px;
+}
+
+.attribute-title {
+    margin-bottom: 15px;
+}
+
+.attribute__list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.attribute__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.attribute__label {
+    font-weight: bold;
+    font-size: 15px;
+    margin-right: 10px;
+}
+
+.attribute__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.attribute__category {
+    padding: 5px 12px;
+    text-align: center;
+    background-color: #D9D9D9;
+    border: none;
+    border-radius: 15px;
+    font-size: 12px;
+}
+
+.attribute__condition {
+    font-size: 15px;
+}
+
+.item-detail__comments {
+    margin-bottom: 10px;
+    color: #5F5F5F;
+}
+
+.comment-title {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.comment-count {
+    margin-left: 8px;
+}
+
+
+
+.comment-list {
+    margin: 0;
+    padding-left: 0;
+}
+
+.comment-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    list-style: none;
+}
+
+.comment-item__user {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.comment-item__user-icon {
+    display: inline-block;
+    vertical-align: middle;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ccc;
+    margin-right: 8px;
+}
+
+.comment-item__user-name {
+    vertical-align: middle;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.comment-item__text {
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #E5E5E5;
+    border: none;
+    border-radius: 5px;
+}
+
+.comment-form__form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-form__title {
+    margin-bottom: 0;
+}
+
+.comment-form__textarea {
+    width: 100%;
+    height: 140px;
+    padding: 12px;
+    border: 2px solid #5F5F5F;
+    border-radius: 5px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.comment-form__button {
+    margin-top: 15px;
+    padding: 5px;
+    width: 100%;
+    text-align: center;
+    background-color: #FF5555;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    cursor: pointer;
+}

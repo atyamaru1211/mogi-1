@@ -1,0 +1,113 @@
+html, body {
+    height: 100%;
+    font-family: "Inter";
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/*ヘッダー*/
+.header {
+    background-color: #000;
+}
+
+.header__inner {
+    display: grid;
+    align-items: center;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 1fr;
+}
+
+.header__logo {
+    grid-column: 1;
+    margin: 0 0 5px 10px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: center;
+    padding: 48px;
+}
+
+
+.header-search {
+    grid-column: 2;
+}
+
+.search-form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.search-form__keyword-input {
+    width: 80%;
+    padding: 8px 20px;
+    font-size: 20px;
+    color: #000000;
+    border: none;
+    border-radius: 5px;
+}
+
+.header-nav {
+    grid-column: 3;
+}
+
+.header-nav__list {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 25px 0 100px;
+    align-items: center;
+}
+
+.header-nav__link {
+    text-decoration: none;
+    font-size: 22px;
+    color: #FFFFFF;
+}
+
+.header-nav__button {
+    padding: 8px 15px;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+@media screen and (max-width:900px) {
+    .header__inner {
+        grid-template-columns: 1fr 2fr 1fr; 
+    }
+
+    .header__logo img {
+        height: 20px; 
+    }
+
+    .header-search {
+        grid-column: 2; 
+    }
+
+    .search-form__keyword-input {
+        font-size: 16px; 
+        padding: 6px 10px; 
+    }
+
+    .header-nav__list {
+        margin: 0 10px 0 20px;
+    }
+
+    .header-nav__link {
+        font-size: 10px; 
+    }
+
+    .header-nav__button {
+        font-size: 10px; 
+        padding: 5px 10px; 
+    }
+}

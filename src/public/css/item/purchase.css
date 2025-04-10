@@ -1,0 +1,142 @@
+.purchase-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 50px;
+    margin: 24px auto;
+    padding: 24px;
+    max-width: 1000px;
+}
+
+.purchase-left {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 20px;
+}
+
+.purchase-right {
+    width: 300px;
+}
+
+.item-section {
+    display: flex;
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #000000;
+}
+
+.item-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    height: 150px;
+    border: none;
+}
+
+.item-image-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-info {
+    flex-grow: 1;
+}
+
+.item-info__name {
+    
+}
+
+.item-info__price {
+    font-size: 20px;
+}
+
+.payment-section {
+    padding:0 0 20px 30px;
+    border-bottom: 1px solid #000000;
+}
+
+.payment-section__title {
+
+}
+
+.payment__select-inner {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.payment__select-inner::after {
+    position: absolute;
+    top: 50%;
+    left: 33%;
+    width: 0;
+    height: 0;
+    border-top: 12px solid #5F5F5F;
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    content: "";
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.payment__select {
+    margin-left: 40px;
+    padding: 5px 60px 5px 10px;
+    border: 1px solid #5F5F5F;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #5F5F5F;
+    appearance: none;
+}
+
+.shipping-section {
+    padding:0 0 20px 30px;
+    border-bottom: 1px solid #000000;
+    position: relative;
+}
+
+.shipping-section__title {
+
+}
+
+.shipping-address {
+    margin-left: 40px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.shipping-address__postal-code {
+    margin-bottom: 0;
+}
+
+.shipping-address__text {
+    margin-top: 0;
+}
+
+.shipping-address__change {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.shipping-address__change-link {
+    display: inline-block;
+    margin-right: 10px;
+    text-decoration: none;
+    color: #0073CC;
+}
+
+.shipping-address__change-link:hover {
+    text-decoration: underline;
+}
+
+.summary-section {
+    padding: 20px;
+    border: 1px solid #000000;
+}
+
+.summary-details {
+    margin-bottom: 16px;
+}
