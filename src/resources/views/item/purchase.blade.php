@@ -73,13 +73,14 @@
                         <span class="price__label">商品代金</span>
                         <span class="price__value">￥ 47,000</span>
                     </p>
+                    <div class="divider"></div>
                     <p class="summary-details__payment">
                         <span class="payment__lavel">支払い方法</span>
                         <span class="payment__value">コンビニ支払い</span>
                     </p>
                 </div>
-                <button class="purchase-button" type="submit">購入する</button>
             </section>
+            <button class="purchase-button" type="submit">購入する</button>
         </div>
     </div>
 </form>

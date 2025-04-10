@@ -1,10 +1,9 @@
 .purchase-container {
     display: flex;
     align-items: flex-start;
-    gap: 50px;
+    gap: 100px;
     margin: 24px auto;
     padding: 24px;
-    max-width: 1000px;
 }
 
 .purchase-left {
@@ -15,7 +14,7 @@
 }
 
 .purchase-right {
-    width: 300px;
+    width: 30%;
 }
 
 .item-section {
@@ -45,10 +44,6 @@
     flex-grow: 1;
 }
 
-.item-info__name {
-    
-}
-
 .item-info__price {
     font-size: 20px;
 }
@@ -58,19 +53,17 @@
     border-bottom: 1px solid #000000;
 }
 
-.payment-section__title {
-
-}
-
 .payment__select-inner {
     margin-bottom: 20px;
     position: relative;
+    width: 40%;
+    padding-left: 40px;
 }
 
 .payment__select-inner::after {
     position: absolute;
     top: 50%;
-    left: 33%;
+    right: 5%;
     width: 0;
     height: 0;
     border-top: 12px solid #5F5F5F;
@@ -82,8 +75,8 @@
 }
 
 .payment__select {
-    margin-left: 40px;
-    padding: 5px 60px 5px 10px;
+    padding: 5px;
+    width: 100%;
     border: 1px solid #5F5F5F;
     border-radius: 4px;
     font-size: 16px;
@@ -95,10 +88,6 @@
     padding:0 0 20px 30px;
     border-bottom: 1px solid #000000;
     position: relative;
-}
-
-.shipping-section__title {
-
 }
 
 .shipping-address {
@@ -133,10 +122,55 @@
 }
 
 .summary-section {
-    padding: 20px;
     border: 1px solid #000000;
 }
 
 .summary-details {
-    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-details__price ,
+.summary-details__payment {
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    margin: 0;
+    padding: 30px 40px;
+}
+
+.divider {
+    width: 100%;
+    height: 1px;
+    background-color: #000000;
+    margin: 0;
+}
+
+.purchase-button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 50px;
+    background-color: #FF5555;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 900px) {
+    .purchase-container {
+        flex-direction: column;
+        gap: 100px;
+    }
+
+    .purchase-left {
+        width: 100%;
+    }
+
+    .purchase-right {
+        width: 80%;
+        margin: 0 auto;
+    }
 }
