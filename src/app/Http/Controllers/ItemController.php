@@ -8,6 +8,6 @@ class ItemController extends Controller
 {
     public function index()
     {
-        return view('item/purchase');
+        return view('item/sell');
     }
 }
