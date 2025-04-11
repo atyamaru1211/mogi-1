@@ -43,7 +43,10 @@
                 <label class="form-label" for="category">カテゴリー</label>
                 <ul class="category-list">
                     <!--foreach-->
-                    <li><input type="radio" name="category" id="category_1" value="1"><label for="category_1">レディース</label></li>
+                    <li>
+                        <input class="category-checkbox" type="checkbox" name="category[]" id="category_1" value="1">
+                        <label class="category-label" for="category_1">レディース</label>
+                    </li>
                 </ul>
             </div>
             <div class="form-group">

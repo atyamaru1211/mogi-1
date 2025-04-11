@@ -49,6 +49,37 @@
     color: #5F5F5F;
 }
 
+.category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+}
+
+.category-list li {
+    margin-right: 10px;
+}
+
+.category-checkbox {
+    display: none;
+}
+
+.category-label {
+    display: inline-block;
+    padding: 3px 7px;
+    border: 2px solid #FF5655;
+    border-radius: 200px;
+    background-color: #FFFFFF;
+    color: #FF5655;
+    font-size: 12px;
+}
+
+.category-checkbox:checked + .category-label {
+    background-color: #FF5655;
+    color: #FFFFFF;
+}
+
 /*プレビュー*/
 .preview-container {
     display: flex;
