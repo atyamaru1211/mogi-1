@@ -7,6 +7,7 @@
 .tab-menu-nav__list {
     display: flex;
     margin-bottom: 5px;
+    list-style: none;
 }
 
 .tab-menu-nav__item {
@@ -16,15 +17,15 @@
 .tab-menu-nav__link {
     text-decoration: none;
     font-weight: bold;
+    color: #5F5F5F;
+}
+
+.tab-menu-nav__link.active {
+    color: #FF0000;
 }
 
 .tab-menu-nav__item:first-child .tab-menu-nav__link {
-    color: #5F5F5F;
     margin-left: 80px;
-}
-
-.tab-menu-nav__item:last-child .tab-menu-nav__link {
-    color: #FF0000;
 }
 
 .product-contents {

@@ -49,7 +49,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="form-group">
+            <div class="form-group select-group">
                 <label class="form-label" for="condition">商品の状態</label>
                 <select class="form-select" name="condition" id="condition">
                     <option desabled selected>選択してください</option>
@@ -70,14 +70,16 @@
             </div>
             <div class="form-group">
                 <label class="form-label" for="description">商品の説明</label>
-                <input class="form-input" type="text" name="description" id="description">
+                <textarea class="form-input description-input" name="description" id="description" row="5"></textarea>
             </div>
-            <div class="form-group">
+            <div class="form-group price-group">
                 <label class="form-label" for="price">販売価格</label>
+                <input class="form-input price-input" type="number" name="price" id="price">
                 <span class="yen">￥</span>
-                <input class="form-input" type="number" name="price" id="price">
             </div>
         </section>
+
+
         <button class="sell-button" type="submit">出品する</button>
     </form>
 </div>

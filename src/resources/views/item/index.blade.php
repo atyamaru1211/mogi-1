@@ -49,4 +49,25 @@
         <!--endforeach-->
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabLinks = document.querySelectorAll('.tab-menu-nav__link');
+
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault(); 
+
+                tabLinks.forEach(tab => {
+                    tab.classList.remove('active');
+                });
+
+                this.classList.add('active');
+
+                // ここで対応するコンテンツの表示/非表示を制御する処理を追加できます
+            });
+        });
+    });
+</script>
+
 @endsection
