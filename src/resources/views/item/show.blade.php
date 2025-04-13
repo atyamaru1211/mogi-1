@@ -12,15 +12,30 @@
 </div>
 <nav class="header-nav">
     <ul class="header-nav__list">
-        <li class="header-nav__item">
-            <a class="header-nav__link" href="/logout">ログアウト</a>
-        </li>
-        <li class="header-nav__item">
-            <a class="header-nav__link" href="/mypage">マイページ</a>
-        </li>
-        <li class="header-nav__item">
-            <a class="header-nav__button" href="/sell">出品</a>
-        </li>
+        @if (Auth::check())
+            <li class="header-nav__item">
+                <form action="/logout" method="post">
+                    @csrf
+                    <button class="header-nav__link" type="submit">ログアウト</button>
+                </form>
+            </li>
+            <li class="header-nav__item">
+                <a class="header-nav__link" href="/mypage">マイページ</a>
+            </li>
+            <li class="header-nav__item">
+                <a class="header-nav__button" href="/sell">出品</a>
+            </li>
+        @else
+            <li class="header-nav__item">
+                <a class="header-nav__link" href="/login">ログイン</a>
+            </li>
+            <li class="header-nav__item">
+                <a class="header-nav__link" href="/login">マイページ</a>
+            </li>
+            <li class="header-nav__item">
+                <a class="header-nav__button" href="/login">出品</a>
+            </li>
+        @endif
     </ul>
 </nav>
 @endsection
