@@ -3,9 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
-class RegisterRequest extends FormRequest
+class ProfileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,7 @@ class RegisterRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return true; //return Auth::check()
     }
 
     /**
@@ -25,10 +25,14 @@ class RegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required'],
-            'email' => ['required', 'email'],
-            'password' => ['required', 'min:8'],
-            'password_confirmation' => ['required', 'min:8', 'same:password'],
+            'profile-image' => ['mimes:png,jpeg'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'profile-image.mimes:png,jpeg' => '「.png」または「.jpeg」形式でアップロードしてください',
         ];
     }
 }

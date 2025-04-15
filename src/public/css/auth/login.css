@@ -1,8 +1,15 @@
+.login-form__alert--danger {
+    padding: 10px 0;
+    border-color: #f5c2c7;
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+
 .login-form__heading {
     text-align: center;
     font-size: 36px;
 }
-
 
 .login-form__inner {
     display: flex;
@@ -38,6 +45,7 @@
     display: block;
     padding: 5px 12px;
     width: 100%;
+    font-size: 16px;
     height: 40px;
     border: 1px solid #5F5F5F;
     border-radius: 4px;
@@ -45,6 +53,7 @@
 
 .login-form__error-message {
     color: #FF9494;
+    margin-top: 0;
 }
 
 .login-form__button {

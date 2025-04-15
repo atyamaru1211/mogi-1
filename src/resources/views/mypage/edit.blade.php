@@ -13,7 +13,10 @@
 <nav class="header-nav">
     <ul class="header-nav__list">
         <li class="header-nav__item">
-            <a class="header-nav__link" href="/logout">ログアウト</a>
+            <form action="/logout" method="post">
+                @csrf
+                <button class="header-nav__link" type="submit">ログアウト</button>
+            </form>
         </li>
         <li class="header-nav__item">
             <a class="header-nav__link" href="/mypage">マイページ</a>
@@ -27,33 +30,48 @@
 
 @section('content')
 <div class="profile-edit-container">
-    <h2 class="purofile-edit-title">プロフィール編集</h2>
-    <form class="profile-edit-form" action="/mypage/profile" enctype="multipart/form-data">
-        <!--if isset profile method PUT endif-->
+    <h2 class="purofile-edit-title">
+        @isset($profile)    
+            プロフィール編集
+        @else
+            プロフィール設定
+        @endisset
+    </h2>
+    <form class="profile-edit-form" action="/mypage/profile" method="POST" enctype="multipart/form-data">
+        @csrf
+        @isset($profile)
+            @method('PATCH')
+        @endisset
         <div class="form-group">
             <div class="image-upload">
-                <div class="profile-image"></div>
+                <div class="profile-image" style="@isset($profile) background-image: url('{{ asset('storage/' . $profile->profile_image_path) }}'); @endisset"></div>
                 <label class="image-upload-label" for="profile-image">画像を選択する</label>
                 <input class="image-upload-input" type="file" name="profile-image" id="profile-image">
             </div>
         </div>
         <div class="form-group">
             <label class="form-label" for="username">ユーザー名</label>
-            <input class="form-input" type="text" name="username" id="username" value="">
+            <input class="form-input" type="text" name="username" id="username" value="{{ $profile ? $profile->name : auth()->user()->name }}">
         </div>
         <div class="form-group">
             <label class="form-label" for="postal_code">郵便番号</label>
-            <input class="form-input" type="text" name="postal_code" id="postal_code" value="">
+            <input class="form-input" type="text" name="postal_code" id="postal_code" value="{{ $profile ? $profile->postal_code : '' }}">
         </div>
         <div class="form-group">
             <label class="form-label" for="address">住所</label>
-            <input class="form-input" type="text" name="address" id="address" value="">
+            <input class="form-input" type="text" name="address" id="address" value="{{ $profile ? $profile->address : '' }}">
         </div>
         <div class="form-group">
             <label class="form-label" for="building">建物名</label>
-            <input class="form-input" type="text" name="building" id="building" value="">
+            <input class="form-input" type="text" name="building" id="building" value="{{ $profile ? $profile->building : '' }}">
         </div>
-        <button class="update-button" type="submit">設定する</button>
+        <button class="update-button" type="submit">
+            @isset($profile)
+                更新する
+            @else
+                設定する
+            @endisset
+        </button>
     </form>
 </div>
 

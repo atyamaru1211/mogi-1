@@ -38,6 +38,7 @@
     display: block;
     padding: 5px 12px;
     width: 100%;
+    font-size: 16px;
     height: 40px;
     border: 1px solid #5F5F5F;
     border-radius: 4px;
@@ -45,6 +46,7 @@
 
 .register-form__error-message {
     color: #FF9494;
+    margin-top: 0;
 }
 
 .register-form__button {

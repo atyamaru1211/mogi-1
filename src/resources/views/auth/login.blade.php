@@ -5,6 +5,14 @@
 @endsection
 
 @section('content')
+        <div class="login-form__alert">
+            @if ($errors->has('email') && session()->has('auth.password'))
+                <div class="login-form__alert--danger">
+                    {{ $errors->first('email') }}
+                </div>
+            @endif
+        </div>
+
         <div class="login-form">
             <h2 class="login-form__heading">ログイン</h2>
             <div class="login-form__inner">
