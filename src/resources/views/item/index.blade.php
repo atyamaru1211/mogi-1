@@ -53,15 +53,18 @@
         </ul>
     </nav>
     <div class="product-contents">
-        <!--foreach-->
+        @foreach ($items as $item)
         <div class="product-content">
-            <a class="product-link" href="/item/:item_id"></a>
-            <img class="product-img" src="" alt="商品画像">
+            <a class="product-link" href="/item/{{ $item->id }}"></a>
+            <img class="product-img" src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->name }}">
             <div class="product-detail">
-                <p class="product-detail__item">商品名</p>
+                <p class="product-detail__item">{{ $item->name }}</p>
+                @if (Auth::check() && $item->purchases()->where('buyer_id', Auth::id())->exists())
+                    <span class="sold-out">Sold</span>
+                @endif
             </div>
         </div>
-        <!--endforeach-->
+        @endforeach
     </div>
 </div>
 

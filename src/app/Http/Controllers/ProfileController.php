@@ -19,7 +19,7 @@ class ProfileController extends Controller
 
     public function update(ProfileRequest $request)
     {
-        $user = Auth::user();
+        $user = auth()->user();
         $profile = $user->profile()->firstOrNew();
         $dir = 'profiles';
         

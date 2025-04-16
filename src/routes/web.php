@@ -12,4 +12,6 @@ Route::get('/', [ItemController::class, 'index']);
 Route::middleware('auth')->group(function () {
    // Route::get('/', [ItemController::class, 'index']);
     Route::get('/mypage/profile', [ProfileController::class, 'edit']);
+    Route::patch('/mypage/profile', [ProfileController::class, 'update']);
+    Route::post('/mypage/profile', [ProfileController::class, 'update']);
 });
