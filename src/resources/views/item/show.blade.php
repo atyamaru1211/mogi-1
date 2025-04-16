@@ -55,14 +55,24 @@
             <span class="price-tax">(税込)</span>
         </div>
         <div class="item-detail__actions">
-            <button class="like-button">
-                <img class="like-button__icon" src="{{ asset('images/star.png') }}" alt="いいね">
-                <span class="like-button__count">3</span>
-            </button>
+            @if (Auth::check())
+                <form action="/item/{{ $item->id }}/like" method="POST">
+                    @csrf
+                    <button class="like-button {{ $item->isLikedBy(Auth::user()) ? 'liked' : '' }}">
+                        <object class="like-button__icon" type="image/svg+xml" data="{{ asset('images/star.svg') }}" alt="いいね"></object>
+                        <span class="like-button__count">{{ $item->likes()->count() }}</span>
+                    </button>
+                </form>
+            @else
+                <a class="like-button" href="/login">
+                    <object class="like-button__icon" type="image/svg+xml" data="{{ asset('images/star.svg') }}" alt="いいね"></object>
+                    <span class="like-button__count">{{ $item->likes()->count() }}</span>
+                </a>
+            @endif
             <button class="comment-button">
-                <img class="comment-button__icon" src="{{ asset('images/comment.png') }}" alt="コメント">
-                <span class="comment-button__count">1</span>
-            </button>
+                    <img class="comment-button__icon" src="{{ asset('images/comment.svg') }}" alt="コメント">
+                    <span class="comment-button__count">1</span>
+                </button>
         </div>
         <button class="purchase-button">購入手続きへ</button>
 

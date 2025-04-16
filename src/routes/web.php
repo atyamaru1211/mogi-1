@@ -15,3 +15,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/mypage/profile', [ProfileController::class, 'update']);
     Route::post('/mypage/profile', [ProfileController::class, 'update']);
 });
+
+//いいね機能
+Route::middleware('auth')->post('/item/{item}/like', [ItemController::class, 'toggleLike']);
+
+//商品詳細画面の表示
+Route::get('/item/{item}', [ItemController::class, 'show']);
+

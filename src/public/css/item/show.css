@@ -77,6 +77,17 @@
 .comment-button__icon {
     width: 20px;
     height: 20px;
+    display: block;
+}
+
+.like-button__icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+
+.like-button.liked .like-button__icon svg {
+    fill: gold;
 }
 
 .purchase-button {
