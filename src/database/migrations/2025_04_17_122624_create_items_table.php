@@ -21,7 +21,6 @@ class CreateItemsTable extends Migration
             $table->text('description');
             $table->integer('price');
             $table->string('image_path');
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->string('condition');
             $table->timestamps();
         });
