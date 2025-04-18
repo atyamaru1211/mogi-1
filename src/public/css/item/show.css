@@ -86,8 +86,8 @@
     fill: currentColor;
 }
 
-.like-button.liked .like-button__icon svg {
-    fill: gold;
+.like-button.liked .like-button__icon {
+    background-color: gold;
 }
 
 .purchase-button {

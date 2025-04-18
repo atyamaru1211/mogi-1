@@ -10,15 +10,28 @@ use App\Models\Like;
 class ItemController extends Controller
 {
     //商品一覧画面の表示
-    public function index()
+    public function index(Request $request)
     {
-        $items = Item::query();
+        $query = Item::query();
 
-        if (Auth::check()) {
-            $items->where('user_id', '!=', Auth::id());
+        //マイリスト表示処理
+        if (Auth::check() && $request->query('tab') === 'mylist') {
+            $likedItemIds = Auth::user()->likes()->pluck('item_id');
+            $query->whereIn('id', $likedItemIds);
+        } elseif (!Auth::check() && $request->query('tab') === 'mylist') {
+            $items = collect();
+            return view('item/index', compact('items'));
         }
 
-        $items = $items->get();
+        //検索機能
+        elseif (!empty($request->keyword)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->keyword . '%')
+                  ->orWhere('description', 'like', '%' . $request->keyword . '%');
+            });
+        }
+
+        $items = $query->get();
 
         return view('item/index', compact('items'));
     }
@@ -33,7 +46,6 @@ class ItemController extends Controller
     public function toggleLike(Request $request, Item $item)
     {
         $user = Auth::user();
-
         $liked = $item->likes()->where('user_id', $user->id)->exists();
 
         if ($liked) {
@@ -45,6 +57,6 @@ class ItemController extends Controller
             $like->save();
         }
 
-        return back();
+        return response()->json(['liked' => !$liked, 'like_count' => $item->likes()->count()]);
     }
 }

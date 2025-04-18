@@ -35,7 +35,7 @@
 }
 
 .product-content {
-    margin: 3px;
+    margin: 30px;
     width: 290px;
     height: 320px;
     box-shadow: 4px 4px 4px #00000040;
@@ -55,15 +55,14 @@
     width: 290px;
     height: 290px;
     border-radius: 4px;
-    margin-bottom: 10px;
 }
 
 .product-detail {
     display: flex;
+    margin-left: 5px;
 }
 
 .product-detail__item {
     margin: 0 ;
     font-size: 20px;
-    background-color: #FFFFFF;
 }

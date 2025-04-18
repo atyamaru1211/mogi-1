@@ -6,8 +6,9 @@
 
 @section('link')
 <div class="header-search">
-    <form class="search-form">
-        <input class="search-form__keyword-input" type="text" name="keyword" placeholder="なにをお探しですか？">
+    <form class="search-form" action="/" method="get">
+        @csrf
+        <input class="search-form__keyword-input" type="text" name="keyword" placeholder="なにをお探しですか？" value="{{ request()->query('keyword') }}">
     </form>
 </div>
 <nav class="header-nav">

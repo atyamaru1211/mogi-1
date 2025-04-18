@@ -6,8 +6,9 @@
 
 @section('link')
 <div class="header-search">
-    <form class="search-form">
-        <input class="search-form__keyword-input" type="text" name="keyword" placeholder="なにをお探しですか？">
+    <form class="search-form" action="/" method="get">
+        @csrf
+        <input class="search-form__keyword-input" type="text" name="keyword" placeholder="なにをお探しですか？" value="{{ request()->query('keyword') }}">
     </form>
 </div>
 <nav class="header-nav">
@@ -41,14 +42,14 @@
 @endsection
 
 @section('content')
-<div class="tab-menu">
+<div class="content">
     <nav class="tab-menu-nav">
         <ul class="tab-menu-nav__list">
             <li class="tab-menu-nav__item">
-                <a class="tab-menu-nav__link" href="#">おすすめ</a>
+                <a class="tab-menu-nav__link {{ request()->query('tab') !== 'mylist' ? 'active' : '' }}" href="/">おすすめ</a>
             </li>
             <li class="tab-menu-nav__item">
-                <a class="tab-menu-nav__link" href="/?tab=mylist">マイリスト</a>
+                <a class="tab-menu-nav__link {{ request()->query('tab') === 'mylist' ? 'active' : '' }}" href="/?tab=mylist">マイリスト</a>
             </li>
         </ul>
     </nav>
@@ -82,7 +83,7 @@
 
                 this.classList.add('active');
 
-                // ここで対応するコンテンツの表示/非表示を制御する処理を追加できます
+                window.location.href = this.getAttribute('href');
             });
         });
     });

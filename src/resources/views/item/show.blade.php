@@ -6,8 +6,9 @@
 
 @section('link')
 <div class="header-search">
-    <form class="search-form">
-        <input class="search-form__keyword-input" type="text" name="keyword" placeholder="なにをお探しですか？">
+    <form class="search-form" action="/" method="get">
+        @csrf
+        <input class="search-form__keyword-input" type="text" name="keyword" placeholder="なにをお探しですか？" value="{{ request()->query('keyword') }}">
     </form>
 </div>
 <nav class="header-nav">
@@ -44,25 +45,22 @@
 <div class="item-detail">
     <div class="item-detail__left">
         <div class="item-img">
-            <img src="item-img__content" alt="商品画像">
+            <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->name }}">
         </div>
     </div>
     <div class="item-detail__right">
-        <h2 class="item-detail__name">商品名がここに入る</h2>
-        <p class="item-detail__brand">ブランド名</p>
+        <h2 class="item-detail__name">{{ $item->name }}</h2>
+        <p class="item-detail__brand">{{ $item->brand }}</p>
         <div class="item-detail__price">
-            <span class="price-amount">￥47,000</span>
+            <span class="price-amount"><span>￥</span><span>{{ number_format($item->price) }}</span></span>
             <span class="price-tax">(税込)</span>
         </div>
         <div class="item-detail__actions">
             @if (Auth::check())
-                <form action="/item/{{ $item->id }}/like" method="POST">
-                    @csrf
-                    <button class="like-button {{ $item->isLikedBy(Auth::user()) ? 'liked' : '' }}">
-                        <object class="like-button__icon" type="image/svg+xml" data="{{ asset('images/star.svg') }}" alt="いいね"></object>
-                        <span class="like-button__count">{{ $item->likes()->count() }}</span>
-                    </button>
-                </form>
+                <button class="like-button {{ $item->isLikedBy(Auth::user()) ? 'liked' : '' }}" id="like-button-{{ $item->id }}">
+                    <object class="like-button__icon" type="image/svg+xml" data="{{ asset('images/star.svg') }}" alt="いいね"></object>
+                    <span class="like-button__count">{{ $item->likes()->count() }}</span>
+                </button>
             @else
                 <a class="like-button" href="/login">
                     <object class="like-button__icon" type="image/svg+xml" data="{{ asset('images/star.svg') }}" alt="いいね"></object>
@@ -70,17 +68,16 @@
                 </a>
             @endif
             <button class="comment-button">
-                    <img class="comment-button__icon" src="{{ asset('images/comment.svg') }}" alt="コメント">
-                    <span class="comment-button__count">1</span>
-                </button>
+                <img class="comment-button__icon" src="{{ asset('images/comment.svg') }}" alt="コメント">
+                <span class="comment-button__count">1</span>
+            </button>
         </div>
+
         <button class="purchase-button">購入手続きへ</button>
 
         <div class="item-detail__description">
             <h3 class="description-title">商品説明</h3>
-            <p class="description-text">
-                カラー：グレー
-            </p>
+            <p class="description-text">{{ $item->description }}</p>
         </div>
 
         <div class="item-detail__attributes">
@@ -89,14 +86,24 @@
                 <div class="attribute__item">
                     <span class="attribute__label">カテゴリー</span>
                     <div class="attribute__categories">
-                        <!--繰り返しのあれ入れる？-->
-                        <span class="attribute__category">洋服</span>
-                        <span class="attribute__category">メンズ</span>
+                        @foreach ($item->categories as $category)
+                            <span class="attribute__category">{{ $category->name }}</span>
+                        @endforeach
                     </div>
                 </div>
                 <div class="attribute__item">
                     <span class="attribute__label">商品の状態</span>
-                    <span class="attribute__condition">良好</span>
+                    <span class="attribute__condition">
+                        @if ($item->condition == 1)
+                            良好
+                        @elseif ($item->condition == 2)
+                            目立った傷や汚れなし
+                        @elseif ($item->condition == 3)
+                            やや傷や汚れあり
+                        @elseif ($item->condition == 4)
+                            状態が悪い
+                        @endif
+                    </span>
                 </div>
             </div>
         </div>
@@ -120,4 +127,46 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const likeButton = document.getElementById('like-button-{{ $item->id }}');
+
+        if (likeButton) {
+            likeButton.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                const itemId = '{{ $item->id }}';
+                const url = `/item/${itemId}/like`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const likeButton = document.getElementById('like-button-{{ $item->id }}');
+                    const likeTextSpan = likeButton.querySelector('.like-button__text');
+                    const likeCountSpan = likeButton.querySelector('.like-button__count');
+
+                    likeCountSpan.textContent = data.like_count;
+
+                    if (data.liked) {
+                        likeButton.classList.add('liked');
+                    } else {
+                        likeButton.classList.remove('liked');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        }
+    });
+</script>
+
 @endsection
