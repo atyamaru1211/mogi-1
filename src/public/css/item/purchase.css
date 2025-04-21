@@ -51,6 +51,7 @@
 .payment-section {
     padding:0 0 20px 30px;
     border-bottom: 1px solid #000000;
+    position: relative;
 }
 
 .payment__select-inner {
@@ -83,6 +84,12 @@
     color: #5F5F5F;
     appearance: none;
 }
+
+.payment__select option:first-child {
+    display: none;
+}
+
+
 
 .shipping-section {
     padding:0 0 20px 30px;
