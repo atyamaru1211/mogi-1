@@ -9,13 +9,26 @@ use App\Http\Controllers\PurchaseController;
 //商品一覧画面の表示　認証不要
 Route::get('/', [ItemController::class, 'index']);
 
+
 //商品一覧画面の表示 認証ミドルウェア
 Route::middleware('auth')->group(function () {
-   // Route::get('/', [ItemController::class, 'index']);
+    //プロフィール編集
     Route::get('/mypage/profile', [ProfileController::class, 'edit']);
     Route::patch('/mypage/profile', [ProfileController::class, 'update']);
     Route::post('/mypage/profile', [ProfileController::class, 'update']);
+    //マイページ
+    Route::get('/mypage', [ProfileController::class, 'index']);
+    /*
+    Route::get('/mypage', [ProfileController::class, 'buyHistory']);
+    Route::get('/mypage', [ProfileController::class, 'sellHistory']);
+    */
+
+    //出品
+    Route::get('/sell', [SellController::class, 'create']);
+    Route::post('/sell', [SellController::class, 'store']);
+
 });
+
 
 //いいね機能
 Route::middleware('auth')->post('/item/{item}/like', [ItemController::class, 'toggleLike']);

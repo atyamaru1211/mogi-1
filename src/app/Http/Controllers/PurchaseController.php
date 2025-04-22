@@ -5,26 +5,31 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\Address;
 use App\Models\Profile;
+use App\Models\Purchase;
 use Illuminate\Http\Request;
 use App\Http\Requests\AddressRequest;
+use App\Http\Requests\PurchaseRequest;
 use Illuminate\Support\Facades\Auth;
+
 
 class PurchaseController extends Controller
 {
-    public function show(Item $item)
+    public function show(Request $request, Item $item)
     {
         $user = Auth::User();
         $profile = null;
+        $shippingAddressFormSession = session('shipping_address');
 
         if ($user) {
             $profile = $user->profile;
         }
-
+    
+    
         $data = [
             'item' => $item,
             'user' => $user,
             'profile' => $profile,
-            'shippingAddress' => null,
+            'shippingAddress' => $shippingAddressFormSession,
         ];
 
         return view('item.purchase', $data);
@@ -45,12 +50,65 @@ class PurchaseController extends Controller
     {
         $user = Auth::user();
 
-        $user->address()->updateOrCreate([], [
+        $addressData = [
+            'item_id' => $item->id,
             'postal_code' => $request->input('postal_code'),
             'address' => $request->input('address'),
             'building' => $request->input('building'),
-        ]);
+        ];
+
+        $user->address()->updateOrCreate(['item_id' => $item->id], $addressData);
+
+        session(['shipping_address' => $addressData]);
 
         return redirect('/purchase/' . $item->id);
     }
+
+
+    public function purchase(PurchaseRequest $request, Item $item)
+    {
+        $user = Auth::user();
+        $paymentMethod = $request->input('payment_method');
+        $shippingAddressData = session('shipping_address');
+        $addressId = null;
+
+        if ($shippingAddressData) {
+            $shippingAddress = Address::updateOrCreate([
+                'user_id' => $user->id,
+                'item_id' => $item->id,
+            ], [
+                'postal_code' => $shippingAddressData['postal_code'],
+                'address' => $shippingAddressData['address'],
+                'building' => $shippingAddressData['building']
+            ]);
+            $addressId = $shippingAddress->id;
+        } else {
+            $profile = $user->profile;
+            $shippingAddress = Address::updateOrCreate([
+                'user_id' => $user->id,
+                'item_id' => $item->id,
+            ], [
+                'postal_code' => $profile->postal_code,
+                'address' => $profile->address,
+                'building' => $profile->building
+            ]);
+            $addressId = $shippingAddress->id;
+        }
+
+        $purchaseData = $request->only(['payment_method']);
+        $purchaseData['item_id'] = $item->id;
+        $purchaseData['seller_id'] = $item->user_id;
+        $purchaseData['purchase_price'] = $item->price;
+        $purchaseData['address_id'] = $addressId;
+        $purchaseData['buyer_id'] = $user->id; 
+        
+        dd($purchaseData);
+        
+        Purchase::create($purchaseData);
+
+        session()->forget('shipping_address');
+
+        return response()->json(['status' => 'success']);
+    }
+
 }

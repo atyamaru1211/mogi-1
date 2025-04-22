@@ -6,10 +6,28 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ProfileRequest;
 use Illuminate\View\View;
 use App\Models\Profile;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    //プロフィール画面表示
+    //マイページ画面表示
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        $tab = $request->query('tab');
+
+        if ($tab === 'sell') {
+            return $this->sellHistory();
+        } elseif ($tab === 'buy') {
+            return $this->buyHistory();
+        } else {
+            return view('mypage.index', ['user' => $user]);
+        }
+    }
+
+
+    //プロフィール編集画面表示
     public function edit():View
     {
         $user = auth()->user();
@@ -17,6 +35,8 @@ class ProfileController extends Controller
         return view('mypage.edit', compact('profile'));
     }
 
+
+    //プロフィール更新処理
     public function update(ProfileRequest $request)
     {
         $user = auth()->user();
@@ -42,4 +62,20 @@ class ProfileController extends Controller
 
         return redirect('/');
     }
+
+    /*
+        public function buyHistory()
+    {
+        $user = Auth::user();
+        $purchases = $user->purchases()->latest()->get(); // 例：購入履歴を取得
+        return view('mypage.buyHistory', compact('purchases'));
+    }
+
+    public function sellHistory()
+    {
+        $user = Auth::user();
+        $items = $user->items()->latest()->get(); // 例：出品履歴を取得
+        return view('mypage.sellHistory', compact('items'));
+    }
+         */
 }

@@ -33,17 +33,17 @@
             <span class="profile-image-icon"></span>
         </div>
         <h2 class="profile-username">ユーザー名</h2>
-        <a class="profile-edit-button" href="/profile/edit">プロフィールを編集</a>
+        <a class="profile-edit-button" href="/mypage/profile">プロフィールを編集</a>
     </div>
 
     <div class="tab-menu">
         <nav class="tab-menu-nav">
             <ul class="tab-menu-nav__list">
                 <li class="tab-menu-nav__item">
-                    <a class="tab-menu-nav__link active" href="#">出品した商品</a>
+                    <a class="tab-menu-nav__link {{ request()->query('tab') === 'sell' ? 'active' : '' }}" href="/mypage?tab=sell">出品した商品</a>
                 </li>
                 <li class="tab-menu-nav__item">
-                    <a class="tab-menu-nav__link" href="#">購入した商品</a>
+                    <a class="tab-menu-nav__link {{ request()->query('tab') === 'buy' ? 'active' : '' }}" href="/mypage?tab=buy">購入した商品</a>
                 </li>
             </ul>
         </nav>

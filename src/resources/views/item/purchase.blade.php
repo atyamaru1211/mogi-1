@@ -47,31 +47,42 @@
             <section class="payment-section">
                 <h3 class="payment-section__title">支払い方法</h3>
                 <div class="payment__select-inner">
-                    <select class="payment__select" name="payment" id="">
+                    <select class="payment__select" name="payment_method" id="payment_method">
                         <option data-display="選択してください" value="">選択してください</option>
-                        <option data-display="コンビニ払い" value="1">コンビニ払い</option>
-                        <option data-display="カード払い" value="2">カード払い</option>
+                        <option data-display="コンビニ払い" value="1" {{ old('payment_method') == '1' ? 'selected' : '' }}>コンビニ払い</option>
+                        <option data-display="カード払い" value="2" {{ old('payment_method') == '2' ? 'selected' : '' }}>カード払い</option>
                     </select>
                 </div>
+                <p class="error-message">
+                    @error('payment_method')
+                    {{ $message }}
+                    @enderror
+                </p>
             </section>
 
             <section class="shipping-section">
                 <h3 class="shipping-section__title">配送先</h3>
                 <div class="shipping-address">
                     <p class="shipping-address__postal-code">
-                        <span>〒</span><span>{{ $profile->postal_code ?? '' }}</span>
+                        <span>〒</span><span>{{ $shippingAddress['postal_code'] ?? $profile->postal_code ?? '' }}</span>
                     </p>
                     <p class="shipping-address__text">
                         <span>
-                            {{ $profile->address ?? '' }}
+                            {{ $shippingAddress['address'] ?? $profile->address ?? '' }}
                         </span>
                         <span>
-                            {{ $profile->building ?? '' }}
+                            {{ $shippingAddress['building'] ?? $profile->building ?? '' }}
                         </span>
                     </p>
                     <div class="shipping-address__change">
                         <a class="shipping-address__change-link" href="/purchase/address/{{ $item->id }}">変更する</a>
                     </div>
+                    <p class="error-message">
+                        @error('address_id')
+                        {{ $message }}
+                        @enderror
+                    </p>
+
                 </div>
             </section>
         </div>
@@ -95,14 +106,20 @@
     </div>
 </form>
 
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const paymentSelect = document.querySelector('.payment__select');
         const paymentOptions = paymentSelect.querySelectorAll('option');
         const paymentValueSpan = document.querySelector('.summary-details__payment .payment__value');
 
-        paymentValueSpan.textContent = paymentSelect.options[paymentSelect.selectedIndex].textContent;
+        const oldPaymentMethod = "{{ old('payment_method') }}";
 
+        if (oldPaymentMethod) {
+            paymentSelect.value = oldPaymentMethod;
+        }
+
+        paymentValueSpan.textContent = paymentSelect.options[paymentSelect.selectedIndex].textContent;
         paymentSelect.addEventListener('change', function() {
             paymentOptions.forEach(option => {
                 option.textContent = option.textContent.replace('✓ ', '');

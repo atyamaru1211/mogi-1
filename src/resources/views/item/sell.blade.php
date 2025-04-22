@@ -54,8 +54,16 @@
                 <label class="form-label" for="condition">商品の状態</label>
                 <select class="form-select" name="condition" id="condition">
                     <option desabled selected>選択してください</option>
-                    <!--foreach-->
+                    <option value="1">良好</option>
+                    <option value="2">目立った傷や汚れなし</option>
+                    <option value="3">やや傷や汚れあり</option>
+                    <option value="4">状態が悪い</option>
                 </select>
+                <p class="error-message">
+                    @error('condition')
+                        {{ $message }}
+                    @enderror
+                </p>
             </div>
         </section>
 

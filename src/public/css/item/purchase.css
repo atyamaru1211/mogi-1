@@ -166,6 +166,11 @@
     cursor: pointer;
 }
 
+.error-message {
+    color: #FF5555;
+    margin-left: 40px;
+}
+
 @media screen and (max-width: 900px) {
     .purchase-container {
         flex-direction: column;
