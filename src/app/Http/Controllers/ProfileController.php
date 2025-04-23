@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ProfileRequest;
 use Illuminate\View\View;
 use App\Models\Profile;
+use App\Models\Item;
+use App\Models\Purchase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,14 +18,18 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $tab = $request->query('tab');
+        $soldItems = [];
+        $boughtItems = [];
 
         if ($tab === 'sell') {
-            return $this->sellHistory();
+            $soldItems = $this->getSellHistory($user);
         } elseif ($tab === 'buy') {
-            return $this->buyHistory();
+            $boughtItems = $this->getBuyHistory($user);
         } else {
-            return view('mypage.index', ['user' => $user]);
+            $soldItems = $this->getSellHistory($user);
         }
+
+        return view('mypage.index', compact('user', 'soldItems', 'boughtItems', 'tab'));
     }
 
 
@@ -42,14 +48,19 @@ class ProfileController extends Controller
         $user = auth()->user();
         $profile = $user->profile()->firstOrNew();
         $dir = 'profiles';
+
+        $oldImagePath = $profile->getOriginal('profile_image_path');
         
         if ($request->hasFile('profile-image')) {
             $file_name = $request->file('profile-image')->getClientOriginalName();
-            $request->file('profile-image')->storeAs('public/' . $dir, $file_name);
-            $profile->profile_image_path = 'storage/' . $dir . '/' . $file_name;
+            $path = $request->file('profile-image')->storeAs('public/' . $dir, $file_name);
+            $profile->profile_image_path = str_replace('public/', 'storage/', $path); // 保存パスを storage/profiles/~~~ の形式に
 
-            if ($profile->getOriginal('profile_image_path')) {
-                Storage::disk('public')->delete($profile->getOriginal('profile_image_path'));
+            if ($oldImagePath) {
+                $oldFilePath = str_replace('storage/', 'public/', $oldImagePath);
+                if (Storage::disk('public')->exists($oldFilePath)) {
+                    Storage::disk('public')->delete($oldFilePath);
+                }
             }
         }
 
@@ -60,22 +71,18 @@ class ProfileController extends Controller
 
         $user->profile()->save($profile);
 
-        return redirect('/');
+        return redirect('/mypage');
+    }
+    
+
+    public function getSellHistory($user)
+    {
+        return Item::where('user_id', $user->id)->latest()->get();
     }
 
-    /*
-        public function buyHistory()
+    public function getBuyHistory($user)
     {
-        $user = Auth::user();
-        $purchases = $user->purchases()->latest()->get(); // 例：購入履歴を取得
-        return view('mypage.buyHistory', compact('purchases'));
+        return Purchase::where('buyer_id', $user->id)->with('item')->latest()->get();
     }
-
-    public function sellHistory()
-    {
-        $user = Auth::user();
-        $items = $user->items()->latest()->get(); // 例：出品履歴を取得
-        return view('mypage.sellHistory', compact('items'));
-    }
-         */
+         
 }

@@ -14,6 +14,11 @@ class ItemController extends Controller
     {
         $query = Item::query();
 
+        //自身の出品商品を除外
+        if (Auth::check()) {
+            $query->where('user_id', '!=', Auth::id());
+        }
+
         //マイリスト表示処理
         if (Auth::check() && $request->query('tab') === 'mylist') {
             $likedItemIds = Auth::user()->likes()->pluck('item_id');

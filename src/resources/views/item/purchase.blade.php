@@ -43,7 +43,6 @@
                     </p>
                 </div>
             </section>
-
             <section class="payment-section">
                 <h3 class="payment-section__title">支払い方法</h3>
                 <div class="payment__select-inner">
@@ -59,7 +58,6 @@
                     @enderror
                 </p>
             </section>
-
             <section class="shipping-section">
                 <h3 class="shipping-section__title">配送先</h3>
                 <div class="shipping-address">
@@ -82,11 +80,9 @@
                         {{ $message }}
                         @enderror
                     </p>
-
                 </div>
             </section>
         </div>
-
         <div class="purchase-right">
             <section class="summary-section">
                 <div class="summary-details">
@@ -106,12 +102,13 @@
     </div>
 </form>
 
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const paymentSelect = document.querySelector('.payment__select');
         const paymentOptions = paymentSelect.querySelectorAll('option');
         const paymentValueSpan = document.querySelector('.summary-details__payment .payment__value');
+        const purchaseForm = document.querySelector('form');
+        const purchaseButton = document.querySelector('.purchase-button');
 
         const oldPaymentMethod = "{{ old('payment_method') }}";
 
@@ -134,6 +131,32 @@
             if (option.value === initialValue && initialValue !== '') {
                 option.textContent = '✓ ' + option.textContent;
             }
+        });
+
+        purchaseForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: this.method,
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': formData.get('_token')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    purchaseButton.textContent = 'Sold';
+                    purchaseButton.disabled = true;
+                } else {
+                    console.error('購入失敗:', data);
+                }
+            })
+            .catch(error => {
+                console.error('通信エラー:', error);
+            });
         });
     });
 </script>

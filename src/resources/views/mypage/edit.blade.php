@@ -45,7 +45,7 @@
         @endisset
         <div class="form-group">
             <div class="image-upload">
-                <div class="profile-image" style="@isset($profile) background-image: url('{{ asset('storage/' . $profile->profile_image_path) }}'); @endisset"></div>
+                <div class="profile-image-preview" style="@isset($profile) background-image: url('{{ asset($profile->profile_image_path) }}'); @endisset"></div>
                 <label class="image-upload-label" for="profile-image">画像を選択する</label>
                 <input class="image-upload-input" type="file" name="profile-image" id="profile-image">
             </div>
@@ -78,7 +78,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const imageInput = document.getElementById('profile_image');
+        const imageInput = document.getElementById('profile-image');
         const imagePreview = document.querySelector('.profile-image-preview');
 
         imageInput.addEventListener('change', function(event) {

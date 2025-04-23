@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SellController;
 
 
 //商品一覧画面の表示　認証不要
@@ -18,10 +19,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/mypage/profile', [ProfileController::class, 'update']);
     //マイページ
     Route::get('/mypage', [ProfileController::class, 'index']);
-    /*
-    Route::get('/mypage', [ProfileController::class, 'buyHistory']);
-    Route::get('/mypage', [ProfileController::class, 'sellHistory']);
-    */
 
     //出品
     Route::get('/sell', [SellController::class, 'create']);

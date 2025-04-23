@@ -102,8 +102,6 @@ class PurchaseController extends Controller
         $purchaseData['address_id'] = $addressId;
         $purchaseData['buyer_id'] = $user->id; 
         
-        dd($purchaseData);
-        
         Purchase::create($purchaseData);
 
         session()->forget('shipping_address');

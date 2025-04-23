@@ -54,12 +54,15 @@
     cursor: pointer;
 }
 
-.profile-image {
+.profile-image-preview {
     width: 100px;
     height: 100px;
     border-radius: 50%;
     background-color: #5F5F5F;
+    background-size: cover;
+    background-position: center;
     margin-right: 20px;
+    overflow: hidden;
 }
 
 .update-button {
@@ -71,27 +74,4 @@
     font-size: 18px;
     cursor: pointer;
     width: 100%;
-}
-
-
-/*プレビュー*/
-.profile-image-preview {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background-color: #ddd;
-    background-size: cover;
-    background-position: center;
-    margin-right: 15px;
-}
-
-.image-upload-button {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
 }
