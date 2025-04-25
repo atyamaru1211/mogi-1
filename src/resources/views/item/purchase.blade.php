@@ -103,62 +103,65 @@
 </form>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const paymentSelect = document.querySelector('.payment__select');
-        const paymentOptions = paymentSelect.querySelectorAll('option');
-        const paymentValueSpan = document.querySelector('.summary-details__payment .payment__value');
-        const purchaseForm = document.querySelector('form');
-        const purchaseButton = document.querySelector('.purchase-button');
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentSelect = document.querySelector('.payment__select');
+    const paymentOptions = paymentSelect.querySelectorAll('option');
+    const paymentValueSpan = document.querySelector('.summary-details__payment .payment__value');
+    const purchaseForm = document.querySelector('form');
+    const purchaseButton = document.querySelector('.purchase-button'); // クラス名が正しいことを確認
 
-        const oldPaymentMethod = "{{ old('payment_method') }}";
+    const oldPaymentMethod = paymentSelect.dataset.oldPayment;
 
-        if (oldPaymentMethod) {
-            paymentSelect.value = oldPaymentMethod;
-        }
+    if (oldPaymentMethod) {
+        paymentSelect.value = oldPaymentMethod;
+    }
 
-        paymentValueSpan.textContent = paymentSelect.options[paymentSelect.selectedIndex].textContent;
-        paymentSelect.addEventListener('change', function() {
-            paymentOptions.forEach(option => {
-                option.textContent = option.textContent.replace('✓ ', '');
-            });
-            const selectedOption = this.options[this.selectedIndex];
-            selectedOption.textContent = '✓ ' + selectedOption.textContent;
-            paymentValueSpan.textContent = selectedOption.textContent.replace('✓ ', '');
-        });
-
-        const initialValue = paymentSelect.value;
+    paymentValueSpan.textContent = paymentSelect.options[paymentSelect.selectedIndex].textContent;
+    paymentSelect.addEventListener('change', function() {
         paymentOptions.forEach(option => {
-            if (option.value === initialValue && initialValue !== '') {
-                option.textContent = '✓ ' + option.textContent;
-            }
+            option.textContent = option.textContent.replace('✓ ', '');
         });
+        const selectedOption = this.options[this.selectedIndex];
+        selectedOption.textContent = '✓ ' + selectedOption.textContent;
+        paymentValueSpan.textContent = selectedOption.textContent.replace('✓ ', '');
+    });
 
-        purchaseForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+    const initialValue = paymentSelect.value;
+    paymentOptions.forEach(option => {
+        if (option.value === initialValue && initialValue !== '') {
+            option.textContent = '✓ ' + option.textContent;
+        }
+    });
 
-            const formData = new FormData(this);
+    purchaseForm.addEventListener('submit', function(event) {
+        event.preventDefault();
 
-            fetch(this.action, {
-                method: this.method,
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': formData.get('_token')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    purchaseButton.textContent = 'Sold';
-                    purchaseButton.disabled = true;
-                } else {
-                    console.error('購入失敗:', data);
-                }
-            })
-            .catch(error => {
-                console.error('通信エラー:', error);
-            });
+        const formData = new FormData(this);
+
+        fetch(this.action, {
+            method: this.method,
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': formData.get('_token')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                purchaseButton.textContent = 'Sold';
+                purchaseButton.disabled = true;
+                purchaseButton.classList.add('purchase-button--sold'); // CSSクラスを追加
+            } else {
+                console.error('購入失敗:', data);
+                alert('購入に失敗しました。もう一度お試しください。');
+            }
+        })
+        .catch(error => {
+            console.error('通信エラー:', error);
+            alert('通信エラーが発生しました。');
         });
     });
+});
 </script>
 
 @endsection

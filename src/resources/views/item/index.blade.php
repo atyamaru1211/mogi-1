@@ -56,14 +56,17 @@
     <div class="product-contents">
         @foreach ($items as $item)
         <div class="product-content">
-            <a class="product-link" href="/item/{{ $item->id }}"></a>
-            <img class="product-img" src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->name }}">
-            <div class="product-detail">
-                <p class="product-detail__item">{{ $item->name }}</p>
-                @if (Auth::check() && $item->purchases()->where('buyer_id', Auth::id())->exists())
-                    <span class="sold-out">Sold</span>
-                @endif
-            </div>
+            <a class="product-link" href="/item/{{ $item->id }}">
+                <div class="product-img-wrapper">
+                    <img class="product-img {{ $item->purchases()->exists() ? 'sold' : '' }}" src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $item->name }}">
+                    @if ($item->purchases()->exists())
+                        <span class="sold-label">Sold</span>
+                    @endif
+                </div>
+                <div class="product-detail">
+                    <p class="product-detail__item">{{ $item->name }}</p>
+                </div>
+            </a>
         </div>
         @endforeach
     </div>

@@ -62,12 +62,12 @@
                 @empty
                 @endforelse
             @elseif (request()->query('tab') === 'buy')
-                @forelse ($boughtItems as $item)
+                @forelse ($boughtItems as $purchase)
                     <div class="product-content">
-                        <a class="product-link" href="/item/{{ $item->id }}"></a>
-                        <img class="product-img" src="" alt="購入した商品画像">
+                        <a class="product-link" href="/item/{{ $purchase->item->id }}"></a>
+                        <img class="product-img" src="{{ asset('storage/' . $purchase->item->image_path) }}" alt="{{ $purchase->item->name }}">
                         <div class="product-detail">
-                            <p class="product-detail__item">購入した商品名</p>
+                            <p class="product-detail__item">{{ $purchase->item->name }}</p>
                         </div>
                     </div>
                 @empty

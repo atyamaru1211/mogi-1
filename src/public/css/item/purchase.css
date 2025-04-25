@@ -166,6 +166,11 @@
     cursor: pointer;
 }
 
+.purchase-button--sold{
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
 .error-message {
     color: #FF5555;
     margin-left: 40px;
