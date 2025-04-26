@@ -60,12 +60,10 @@
         </div>
         <div class="item-detail__actions">
             @if (Auth::check())
-                <button class="like-button {{ $item->isLikedBy(Auth::user()) ? 'liked' : '' }}" id="like-button-{{ $item->id }}">
-                    <svg class="like-button__link" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <use xlink:href="{{ asset('images/star.svg#star-icon') }}" />
-                    </svg>
-                    <span class="like-button__count">{{ $item->likes()->count() }}</span>
-                </button>
+            <button class="like-button {{ $item->isLikedBy(Auth::user()) ? 'liked' : '' }}" id="like-button-{{ $item->id }}">
+                <object class="like-button__icon" id="like-icon-{{ $item->id }}" type="image/svg+xml" data="{{ asset('images/star.svg') }}" alt="いいね"></object>
+                <span class="like-button__count">{{ $item->likes()->count() }}</span>
+            </button>
             @else
                 <div class="like-button">
                     <a class="like-button__link" href="/login">
@@ -140,46 +138,52 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const likeButton = document.getElementById('like-button-{{ $item->id }}');
+document.addEventListener('DOMContentLoaded', function() {
+    const likeButton = document.getElementById('like-button-{{ $item->id }}');
+    const likeIconObject = document.getElementById('like-icon-{{ $item->id }}');
 
-        if (likeButton) {
-            likeButton.addEventListener('click', function(event) {
-                event.preventDefault();
+    if (likeButton && likeIconObject) {
+        likeButton.addEventListener('click', function(event) {
+            event.preventDefault();
 
-                const itemId = '{{ $item->id }}';
-                const url = `/item/${itemId}/like`;
+            const itemId = '{{ $item->id }}';
+            const url = `/item/${itemId}/like`;
+            const likeCountSpan = likeButton.querySelector('.like-button__count');
 
-                const likeIcon = likeButton.querySelector('.like-button__link svg');
-                const likeRect = likeIcon ? likeIcon.querySelector('rect') : null;
-                const likeCountSpan = likeButton.querySelector('.like-button__count');
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (likeCountSpan) {
+                    likeCountSpan.textContent = data.like_count;
+                }
 
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (likeCountSpan) {
-                        likeCountSpan.textContent = data.like_count;
-                    }
+                const isLiked = data.liked;
+                const defaultIconPath = '{{ asset('images/star.svg') }}';
+                const likedIconPath = '{{ asset('images/star_after.svg') }}';
 
-                    if (data.liked) {
-                        likeButton.classList.add('liked');
-                    } else {
-                        likeButton.classList.remove('liked');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+                // アイコンの切り替え
+                likeIconObject.setAttribute('data', isLiked ? likedIconPath : defaultIconPath);
+
+                // 'liked' クラスの付与・削除 (CSS でスタイルを調整する場合)
+                if (isLiked) {
+                    likeButton.classList.add('liked');
+                } else {
+                    likeButton.classList.remove('liked');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
             });
-        }
-    });
+        });
+    }
+});
 </script>
 
 @endsection
