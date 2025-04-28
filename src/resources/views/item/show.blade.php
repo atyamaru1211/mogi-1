@@ -61,7 +61,7 @@
         <div class="item-detail__actions">
             @if (Auth::check())
             <button class="like-button {{ $item->isLikedBy(Auth::user()) ? 'liked' : '' }}" id="like-button-{{ $item->id }}">
-                <object class="like-button__icon" id="like-icon-{{ $item->id }}" type="image/svg+xml" data="{{ asset('images/star.svg') }}" alt="いいね"></object>
+                <object class="like-button__icon" id="like-icon-{{ $item->id }}" type="image/svg+xml" data="{{ $item->isLikedBy(Auth::user()) ? asset('images/star_after.svg') : asset('images/star.svg') }}" alt="いいね"></object>
                 <span class="like-button__count">{{ $item->likes()->count() }}</span>
             </button>
             @else
@@ -74,7 +74,7 @@
             @endif
             <button class="comment-button">
                 <img class="comment-button__icon" src="{{ asset('images/comment.svg') }}" alt="コメント">
-                <span class="comment-button__count">1</span>
+                <span class="comment-button__count">{{ $item->comments()->count() }}</span>
             </button>
         </div>
 
@@ -118,20 +118,32 @@
         </div>
 
         <div class="item-detail__comments">
-            <h3 class="comment-title">コメント<span class="comment-count">(1)</span></h3>
+            <h3 class="comment-title">コメント<span class="comment-count">({{ $item->comments()->count() }})</span></h3>
             <ul class="comment-list">
-                <li class="comment-item">
-                    <p class="comment-item__user">
-                        <span class="comment-item__user-icon"></span>
-                        <span class="comment-item__user-name">admin</span>
-                    </p>
-                    <p class="comment-item__text">こちらにコメントが入ります。</p>
-                </li>
+                @foreach ($item->comments as $comment)
+                    <li class="comment-item">
+                        <p class="comment-item__user">
+                            <span class="comment-item__user-icon"></span>
+                            <span class="comment-item__user-name">{{ $comment->user->name }}</span>
+                        </p>
+                        <p class="comment-item__text">{{ $comment->content }}</p>
+                    </li>
+                @endforeach
             </ul>
-            <form class="comment-form__form">
+            <form class="comment-form__form" action="/item/{{ $item->id }}/comment" method="POST">
+                @csrf
                 <h4 class="comment-form__title">商品へのコメント</h4>
-                <textarea class="comment-form__textarea"></textarea>
-                <button class="comment-form__button" type="submit">コメントを送信する</button>
+                <textarea class="comment-form__textarea" name="content"></textarea>
+                <p class="error-message">
+                    @error('content')
+                    {{ $message }}
+                    @enderror
+                </p>
+                @if (Auth::check())
+                    <button class="comment-form__button" type="submit">コメントを送信する</button>
+                @else
+                    <a class="comment-form__button" href="/login">コメントを送信する</a>
+                @endif
             </form>
         </div>
     </div>

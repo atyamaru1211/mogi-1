@@ -45,3 +45,5 @@ Route::middleware('auth')->get('/purchase/address/{item}', [PurchaseController::
 //配送先住所変更処理
 Route::middleware('auth')->post('/purchase/address/{item}', [PurchaseController::class, 'update']);
 
+//コメント送信機能
+Route::middleware('auth')->post('/item/{item}/comment', [ItemController::class, 'store']);

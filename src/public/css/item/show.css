@@ -311,3 +311,8 @@
     font-size: 15px;
     cursor: pointer;
 }
+
+.error-message {
+    margin-top: 0;
+    color: #FF5555;
+}
