@@ -60,7 +60,9 @@ class CustomRegisteredUserController extends Controller
             ]);
         }
 
-        event(new Registered($user = $creator->create($request->all())));
+        $user = $creator->create($request->all()); // ★ ユーザーを作成
+        event(new Registered($user)); // ★ 作成された $user を渡す
+        //event(new Registered($user = $creator->create($request->all())));
 
         return app(RegisterResponse::class);
     }

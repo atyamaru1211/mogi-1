@@ -9,10 +9,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait; // ★ 追加
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail // ★ implements MustVerifyEmail を追加
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, MustVerifyEmailTrait; // ★ MustVerifyEmailTrait を use
 
     /**
      * The attributes that are mass assignable.
