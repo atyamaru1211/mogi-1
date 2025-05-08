@@ -2,13 +2,14 @@
 
 namespace App\Http\Responses;
 
+use Illuminate\Support\Facades\Session;
 use Laravel\Fortify\Contracts\RegisterResponse as RegisterResponseContract;
-use Symfony\Component\HttpFoundation\Response;
 
 class RegisterResponse implements RegisterResponseContract
 {
     public function toResponse($request)
     {
-        return redirect('/mypage/profile');
+        Session::put('just_registered', true);
+        return redirect()->intended('/mypage/profile');
     }
 }

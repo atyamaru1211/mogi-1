@@ -5,8 +5,10 @@ namespace App\Providers;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -17,7 +19,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/';
+    public const HOME = '/mypage/profile';
 
     /**
      * The controller namespace for the application.
@@ -26,7 +28,6 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string|null
      */
-    // protected $namespace = 'App\\Http\\Controllers';
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -61,4 +62,15 @@ class RouteServiceProvider extends ServiceProvider
         });
     }
 
+    public static function home()
+    {
+        if (Auth::check()) {
+            if (Session::get('just_registered')) {
+                Session::forget('just_registered'); 
+                return self::HOME; 
+            }
+            return '/'; 
+        }
+        return '/login';
+    }
 }
