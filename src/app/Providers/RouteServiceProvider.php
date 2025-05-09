@@ -64,13 +64,16 @@ class RouteServiceProvider extends ServiceProvider
 
     public static function home()
     {
-        if (Auth::check()) {
+        if (Auth::check() && Auth::user()->hasVerifiedEmail()) {
+            return '/';
+        }
+        /*if (Auth::check()) {
             if (Session::get('just_registered')) {
                 Session::forget('just_registered'); 
                 return self::HOME; 
             }
             return '/'; 
-        }
+        }*/
         return '/login';
     }
 }

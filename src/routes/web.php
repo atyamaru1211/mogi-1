@@ -5,12 +5,23 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SellController;
+use App\Http\Controllers\Auth\CustomRegisteredUserController;
 
 
 //商品一覧画面の表示　認証不要
 Route::get('/', [ItemController::class, 'index']);
 //商品詳細画面の表示　認証不要
 Route::get('/item/{item}', [ItemController::class, 'show']);
+
+//メール認証誘導画面の表示　認証不要
+Route::get('/email/verify/notice', function () {
+    return view('auth.verify');
+});
+
+// カスタム登録ルートで CustomRegisteredUserController を使用するように設定 
+Route::middleware(['guest:' . config('fortify.guard')])->group(function () {
+    Route::post('/register', [CustomRegisteredUserController::class, 'store']);
+});
 
 
 //商品一覧画面の表示 認証ミドルウェア
