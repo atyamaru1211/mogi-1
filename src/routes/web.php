@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SellController;
 use App\Http\Controllers\Auth\CustomRegisteredUserController;
+use App\Http\Controllers\Auth\ResendVerificationEmailController;
 
 
 //商品一覧画面の表示　認証不要
@@ -23,6 +24,14 @@ Route::middleware(['guest:' . config('fortify.guard')])->group(function () {
     Route::post('/register', [CustomRegisteredUserController::class, 'store']);
 });
 
+//Mailhogへのルート
+Route::get('/mailhog', function () {
+    return redirect('http://localhost:8025');
+});
+
+Route::post('/email/verification-notification', [ResendVerificationEmailController::class, 'store'])
+    ->middleware(['throttle:6,1'])->name('verification.resend');
+
 
 //商品一覧画面の表示 認証ミドルウェア
 Route::middleware('auth')->group(function () {
@@ -39,8 +48,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/item/{item}/like', [ItemController::class, 'toggleLike']);
     //商品購入画面の表示
     Route::get('/purchase/{item}', [PurchaseController::class, 'show']);
+
     //商品購入処理
     Route::post('/purchase/{item}', [PurchaseController::class, 'purchase']);
+    Route::get('/item/{item}/purchased', [PurchaseController::class, 'purchaseSuccess']);
+
     //配送先住所変更画面の表示
     Route::get('/purchase/address/{item}', [PurchaseController::class, 'edit']);
     //配送先住所変更処理

@@ -14,7 +14,10 @@
 <nav class="header-nav">
     <ul class="header-nav__list">
         <li class="header-nav__item">
-            <a class="header-nav__link" href="/logout">ログアウト</a>
+            <form action="/logout" method="post">
+                @csrf
+                <button class="header-nav__link" type="submit">ログアウト</button>
+            </form>
         </li>
         <li class="header-nav__item">
             <a class="header-nav__link" href="/mypage">マイページ</a>
@@ -48,8 +51,8 @@
                 <div class="payment__select-inner">
                     <select class="payment__select" name="payment_method" id="payment_method">
                         <option data-display="選択してください" value="">選択してください</option>
-                        <option data-display="コンビニ払い" value="1" {{ old('payment_method') == '1' ? 'selected' : '' }}>コンビニ払い</option>
-                        <option data-display="カード払い" value="2" {{ old('payment_method') == '2' ? 'selected' : '' }}>カード払い</option>
+                        <option data-display="コンビニ払い" value="konbini" {{ old('payment_method') == 'konbini' ? 'selected' : '' }}>コンビニ払い</option>
+                        <option data-display="カード払い" value="card" {{ old('payment_method') == 'card' ? 'selected' : '' }}>カード払い</option>
                     </select>
                 </div>
                 <p class="error-message">
@@ -103,6 +106,26 @@
 </form>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentSelect = document.querySelector('.payment__select');
+    const paymentValueSpan = document.querySelector('.summary-details__payment .payment__value');
+
+    // 初期表示時に支払い方法を表示
+    paymentValueSpan.textContent = paymentSelect.options[paymentSelect.selectedIndex].textContent;
+
+    // 選択肢が変更されたときに支払い方法を更新
+    paymentSelect.addEventListener('change', function() {
+        paymentValueSpan.textContent = this.options[this.selectedIndex].textContent;
+    });
+
+    // ページロード時にも初期値を反映させる（もし選択済みの値があれば）
+    if (paymentSelect.value) {
+        paymentValueSpan.textContent = paymentSelect.options[paymentSelect.selectedIndex].textContent;
+    }
+});
+</script>
+
+<!--<script>
 document.addEventListener('DOMContentLoaded', function() {
     const paymentSelect = document.querySelector('.payment__select');
     const paymentOptions = paymentSelect.querySelectorAll('option');
@@ -162,6 +185,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-</script>
+</script>-->
 
 @endsection

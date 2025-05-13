@@ -9,9 +9,9 @@
             <div class="verify-notice__inner">
                 <p class="verify-notice__heading">登録していただいたメールアドレスに認証メールを送付しました。<br>メール認証を完了してください。</p>
                 <div class="verify-notice__button-container">
-                    <button class="verify-notice__button">認証はこちらから</button>
+                    <a class="verify-notice__button" href="/mailhog">認証はこちらから</a>
                 </div>
-                <form class="verify-notice__resend-form" method="POST" action="">
+                <form class="verify-notice__resend-form" method="POST" action="{{ route('verification.resend') }}">
                     @csrf
                     <button class="verify-notice__resend-link" type="submit">認証メールを再送する</button>
                 </form>
