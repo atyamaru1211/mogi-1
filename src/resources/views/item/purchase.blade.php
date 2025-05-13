@@ -79,7 +79,7 @@
                         <a class="shipping-address__change-link" href="/purchase/address/{{ $item->id }}">変更する</a>
                     </div>
                     <p class="error-message">
-                        @error('address_id')
+                        @error('address_existence')
                         {{ $message }}
                         @enderror
                     </p>
@@ -103,28 +103,70 @@
             <button class="purchase-button" type="submit">購入する</button>
         </div>
     </div>
+    <input type="hidden" name="address_existence" value="exists">
 </form>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const paymentSelect = document.querySelector('.payment__select');
+    const paymentOptions = paymentSelect.querySelectorAll('option');
     const paymentValueSpan = document.querySelector('.summary-details__payment .payment__value');
+    const purchaseForm = document.querySelector('form');
+    const purchaseButton = document.querySelector('.purchase-button'); // クラス名が正しいことを確認
 
-    // 初期表示時に支払い方法を表示
+    const oldPaymentMethod = paymentSelect.dataset.oldPayment;
+
+    if (oldPaymentMethod) {
+        paymentSelect.value = oldPaymentMethod;
+    }
+
     paymentValueSpan.textContent = paymentSelect.options[paymentSelect.selectedIndex].textContent;
-
-    // 選択肢が変更されたときに支払い方法を更新
     paymentSelect.addEventListener('change', function() {
-        paymentValueSpan.textContent = this.options[this.selectedIndex].textContent;
+        paymentOptions.forEach(option => {
+            option.textContent = option.textContent.replace('✓ ', '');
+        });
+        const selectedOption = this.options[this.selectedIndex];
+        selectedOption.textContent = '✓ ' + selectedOption.textContent;
+        paymentValueSpan.textContent = selectedOption.textContent.replace('✓ ', '');
     });
 
-    // ページロード時にも初期値を反映させる（もし選択済みの値があれば）
-    if (paymentSelect.value) {
-        paymentValueSpan.textContent = paymentSelect.options[paymentSelect.selectedIndex].textContent;
-    }
+    const initialValue = paymentSelect.value;
+    paymentOptions.forEach(option => {
+        if (option.value === initialValue && initialValue !== '') {
+            option.textContent = '✓ ' + option.textContent;
+        }
+    });
+
+    purchaseForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch(this.action, {
+            method: this.method,
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': formData.get('_token')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                purchaseButton.textContent = 'Sold';
+                purchaseButton.disabled = true;
+                purchaseButton.classList.add('purchase-button--sold'); // CSSクラスを追加
+            } else {
+                console.error('購入失敗:', data);
+                alert('購入に失敗しました。もう一度お試しください。');
+            }
+        })
+        .catch(error => {
+            console.error('通信エラー:', error);
+            alert('通信エラーが発生しました。');
+        });
+    });
 });
 </script>
-
 <!--<script>
 document.addEventListener('DOMContentLoaded', function() {
     const paymentSelect = document.querySelector('.payment__select');

@@ -26,7 +26,7 @@ class PurchaseController extends Controller
         if ($user) {
             $profile = $user->profile;
         }
-    
+
         $data = [
             'item' => $item,
             'user' => $user,
@@ -89,13 +89,15 @@ class PurchaseController extends Controller
         $checkoutParams = [
             'line_items' => $lineItems,
             'mode' => 'payment',
-            'success_url' => url('/item/' . $item->id . '/purchased'),
+            'success_url' => url('/item/' . $item->id. '/purchased'), 
         ];
 
         if ($paymentMethod === 'konbini') {
             $checkoutParams['payment_method_types'] = ['konbini'];
+            session(['payment_method_type' => 'konbini']);
         } elseif ($paymentMethod === 'card') {
             $checkoutParams['payment_method_types'] = ['card'];
+            session(['payment_method_type' => 'card']);
         }
 
         try {
@@ -107,58 +109,63 @@ class PurchaseController extends Controller
     }
 
     public function purchaseSuccess(Item $item)
-        {
-            $user = Auth::user();
-            $shippingAddressData = session('shipping_address');
-            $addressId = null;
+    {
+         \Log::info('purchaseSuccess メソッドが実行されました (開始)');
+        $user = Auth::user();
+        $shippingAddressData = session('shipping_address');
+        $paymentMethodType = session('payment_method_type');
+        $addressId = null;
 
-            DB::beginTransaction();
-            try {
-                if ($shippingAddressData) {
-                    $shippingAddress = Address::updateOrCreate([
-                        'user_id' => $user->id,
-                        'item_id' => $item->id,
-                    ], [
-                        'postal_code' => $shippingAddressData['postal_code'],
-                        'address' => $shippingAddressData['address'],
-                        'building' => $shippingAddressData['building']
-                    ]);
-                    $addressId = $shippingAddress->id;
-                } else {
-                    $profile = $user->profile;
-                    $shippingAddress = Address::updateOrCreate([
-                        'user_id' => $user->id,
-                        'item_id' => $item->id,
-                    ], [
-                        'postal_code' => $profile->postal_code,
-                        'address' => $profile->address,
-                        'building' => $profile->building
-                    ]);
-                    $addressId = $shippingAddress->id;
-                }
-                Purchase::create([
+        DB::beginTransaction();
+        \Log::info('トランザクションを開始');
+        try {
+            if ($shippingAddressData) {
+                $shippingAddress = Address::updateOrCreate([
+                    'user_id' => $user->id,
                     'item_id' => $item->id,
-                    'seller_id' => $item->user_id,
-                    'purchase_price' => $item->price,
-                    'address_id' => $addressId,
-                    'buyer_id' => $user->id,
-                    'payment_method' => request()->input('payment_method_type') === 'konbini' ? 'コンビニ払い' : 'カード払い', // 支払い方法を保存
+                ], [
+                    'postal_code' => $shippingAddressData['postal_code'],
+                    'address' => $shippingAddressData['address'],
+                    'building' => $shippingAddressData['building']
                 ]);
-
-                session()->forget('shipping_address');
-
-                $item->buyer_id = $user->id;
-                $item->save();
-
-                DB::commit();
-
-                return redirect('/item/' . $item->id)->with('success_sold', true);
-            } catch (\Exception $e) {
-                DB::rollback();
-                return redirect('/purchase/' . $item->id)->with('error', '購入処理中にエラーが発生しました。');
+                $addressId = $shippingAddress->id;
+                \Log::info('Address created/updated: ' . $addressId); // ログ出力
+            } else {
+                $profile = $user->profile;
+                $shippingAddress = Address::updateOrCreate([
+                    'user_id' => $user->id,
+                    'item_id' => $item->id,
+                ], [
+                    'postal_code' => $profile->postal_code,
+                    'address' => $profile->address,
+                    'building' => $profile->building
+                ]);
+                $addressId = $shippingAddress->id;
+                \Log::info('Address created/updated (from profile): ' . $addressId); // ログ出力
             }
-        }
+            $purchase = Purchase::create([
+                'item_id' => $item->id,
+                'seller_id' => $item->user_id,
+                'purchase_price' => $item->price,
+                'address_id' => $addressId,
+                'buyer_id' => $user->id,
+                'payment_method' => $paymentMethodType === 'konbini' ? 'コンビニ払い' : 'カード払い', // 支払い方法を保存
+            ]);
+            \Log::info('Purchase created: ' . $purchase->id); // ログ出力
 
+            session()->forget('shipping_address');
+            session()->forget('payment_method_type');
+
+            DB::commit();
+
+            return redirect('/item/' . $item->id);
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('Purchase failed: ' . $e->getMessage()); // エラーログ出力
+            return redirect('/purchase/' . $item->id)->with('error', '購入処理中にエラーが発生しました。');
+        }
+    }
+}
         /*
         $user = Auth::user();
         $paymentMethod = $request->input('payment_method');
@@ -222,4 +229,4 @@ class PurchaseController extends Controller
             return response()->json(['status' => 'error', 'message' => '購入処理中にエラーが発生しました']);
         }
     }*/
-}
+

@@ -7,6 +7,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SellController;
 use App\Http\Controllers\Auth\CustomRegisteredUserController;
 use App\Http\Controllers\Auth\ResendVerificationEmailController;
+use App\Http\Controllers\StripeWebhookController;
 
 
 //商品一覧画面の表示　認証不要
@@ -31,6 +32,9 @@ Route::get('/mailhog', function () {
 
 Route::post('/email/verification-notification', [ResendVerificationEmailController::class, 'store'])
     ->middleware(['throttle:6,1'])->name('verification.resend');
+
+//stripeからの通知受け取り
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);
 
 
 //商品一覧画面の表示 認証ミドルウェア

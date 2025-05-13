@@ -30,7 +30,6 @@ class ExhibitionRequest extends FormRequest
             'image_upload' => ['required', 'mimes:jpeg,png'],
             'condition' => ['required'],
             'category' => ['required', 'min:1'],
-            'category.*' => ['exists:categories,id'],
         ];
     }
 
@@ -48,7 +47,6 @@ class ExhibitionRequest extends FormRequest
             'condition.required' => '商品の状態を選択してください',
             'category.required' => 'カテゴリーを選択してください',
             'category.min' => 'カテゴリーは1つ以上選択してください',
-            'category.*.exists' => '選択されたカテゴリーは存在しません',
         ];
     }
 }

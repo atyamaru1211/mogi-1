@@ -55,9 +55,93 @@ class ItemController extends Controller
     }
 
     //商品詳細画面の表示
-    public function show(Item $item)
+    public function show(Request $request, Item $item)
     {
-        return view('item.show', compact('item'));
+        $sessionId = $request->get('session_id');
+
+        if ($sessionId) {
+            Stripe::setApiKey(config('services.stripe.secret'));
+
+            try {
+                $checkoutSession = Session::retrieve($sessionId);
+
+                if ($checkoutSession->payment_status === 'paid') {
+                    // ★ 決済が完了しているので、purchases テーブルにデータを保存する処理を実行
+                    $user = Auth::user(); // 認証済みユーザーを取得
+                    if ($user) {
+                        DB::beginTransaction();
+                        try {
+                            $shippingAddressData = session('shipping_address');
+                            $addressId = null;
+
+                            if ($shippingAddressData) {
+                                $shippingAddress = Address::updateOrCreate([
+                                    'user_id' => $user->id,
+                                    'item_id' => $item->id,
+                                ], [
+                                    'postal_code' => $shippingAddressData['postal_code'],
+                                    'address' => $shippingAddressData['address'],
+                                    'building' => $shippingAddressData['building']
+                                ]);
+                                $addressId = $shippingAddress->id;
+                            } else {
+                                $profile = $user->profile;
+                                $shippingAddress = Address::updateOrCreate([
+                                    'user_id' => $user->id,
+                                    'item_id' => $item->id,
+                                ], [
+                                    'postal_code' => $profile->postal_code,
+                                    'address' => $profile->address,
+                                    'building' => $profile->building
+                                ]);
+                                $addressId = $shippingAddress->id;
+                            }
+
+                            $paymentMethodType = session('payment_method_type'); // セッションから取得
+
+                            Purchase::create([
+                                'item_id' => $item->id,
+                                'seller_id' => $item->user_id,
+                                'purchase_price' => $item->price,
+                                'address_id' => $addressId,
+                                'buyer_id' => $user->id,
+                                'payment_method' => $paymentMethodType === 'konbini' ? 'コンビニ払い' : 'カード払い',
+                            ]);
+
+                            session()->forget('shipping_address');
+                            session()->forget('payment_method_type'); // ★ ここで削除
+
+                            DB::commit();
+                            \Log::info('購入処理が完了しました (リダイレクト時)');
+                            // ★ ここでSold表示などの処理を行う
+                        } catch (\Exception $e) {
+                            DB::rollback();
+                            \Log::error('購入処理中にエラーが発生しました (リダイレクト時): ' . $e->getMessage());
+                        }
+                    }
+                }
+            } catch (\Stripe\Exception\ApiErrorException $e) {
+                \Log::error('Stripe API エラー (リダイレクト時): ' . $e->getMessage());
+            }
+        }
+
+        $user = Auth::User();
+        $profile = null;
+        $shippingAddressFormSession = session('shipping_address');
+
+        if ($user) {
+            $profile = $user->profile;
+        }
+
+        $data = [
+            'item' => $item,
+            'user' => $user,
+            'profile' => $profile,
+            'shippingAddress' => $shippingAddressFormSession,
+        ];
+
+        return view('item.show', $data);
+        //return view('item.show', compact('item'));
     }
 
     //いいね機能
