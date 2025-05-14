@@ -48,19 +48,39 @@
                 <div class="profile-image-preview" style="@isset($profile) background-image: url('{{ asset($profile->profile_image_path) }}'); @endisset"></div>
                 <label class="image-upload-label" for="profile-image">画像を選択する</label>
                 <input class="image-upload-input" type="file" name="profile-image" id="profile-image">
+                <p class="error-message">
+                    @error('profile-image')
+                        {{ $message }}
+                    @enderror
+                </p>
             </div>
         </div>
         <div class="form-group">
-            <label class="form-label" for="username">ユーザー名</label>
-            <input class="form-input" type="text" name="username" id="username" value="{{ $profile ? $profile->name : auth()->user()->name }}">
+            <label class="form-label" for="name">ユーザー名</label>
+            <input class="form-input" type="text" name="name" id="name" value="{{ $profile ? $profile->name : auth()->user()->name }}">
+            <p class="error-message">
+                @error('name')
+                    {{ $message }}
+                @enderror
+            </p>
         </div>
         <div class="form-group">
             <label class="form-label" for="postal_code">郵便番号</label>
             <input class="form-input" type="text" name="postal_code" id="postal_code" value="{{ $profile ? $profile->postal_code : '' }}">
+            <p class="error-message">
+                @error('postal_code')
+                    {{ $message }}
+                @enderror
+            </p>
         </div>
         <div class="form-group">
             <label class="form-label" for="address">住所</label>
             <input class="form-input" type="text" name="address" id="address" value="{{ $profile ? $profile->address : '' }}">
+            <p class="error-message">
+                @error('address')
+                    {{ $message }}
+                @enderror
+            </p>
         </div>
         <div class="form-group">
             <label class="form-label" for="building">建物名</label>

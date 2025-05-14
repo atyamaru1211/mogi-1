@@ -110,14 +110,12 @@ class PurchaseController extends Controller
 
     public function purchaseSuccess(Item $item)
     {
-         \Log::info('purchaseSuccess メソッドが実行されました (開始)');
         $user = Auth::user();
         $shippingAddressData = session('shipping_address');
         $paymentMethodType = session('payment_method_type');
         $addressId = null;
 
         DB::beginTransaction();
-        \Log::info('トランザクションを開始');
         try {
             if ($shippingAddressData) {
                 $shippingAddress = Address::updateOrCreate([
@@ -129,7 +127,6 @@ class PurchaseController extends Controller
                     'building' => $shippingAddressData['building']
                 ]);
                 $addressId = $shippingAddress->id;
-                \Log::info('Address created/updated: ' . $addressId); // ログ出力
             } else {
                 $profile = $user->profile;
                 $shippingAddress = Address::updateOrCreate([
@@ -141,7 +138,6 @@ class PurchaseController extends Controller
                     'building' => $profile->building
                 ]);
                 $addressId = $shippingAddress->id;
-                \Log::info('Address created/updated (from profile): ' . $addressId); // ログ出力
             }
             $purchase = Purchase::create([
                 'item_id' => $item->id,
@@ -149,9 +145,8 @@ class PurchaseController extends Controller
                 'purchase_price' => $item->price,
                 'address_id' => $addressId,
                 'buyer_id' => $user->id,
-                'payment_method' => $paymentMethodType === 'konbini' ? 'コンビニ払い' : 'カード払い', // 支払い方法を保存
+                'payment_method' => $paymentMethodType === 'konbini' ? 'コンビニ払い' : 'カード払い', 
             ]);
-            \Log::info('Purchase created: ' . $purchase->id); // ログ出力
 
             session()->forget('shipping_address');
             session()->forget('payment_method_type');
@@ -161,72 +156,7 @@ class PurchaseController extends Controller
             return redirect('/item/' . $item->id);
         } catch (\Exception $e) {
             DB::rollback();
-            \Log::error('Purchase failed: ' . $e->getMessage()); // エラーログ出力
-            return redirect('/purchase/' . $item->id)->with('error', '購入処理中にエラーが発生しました。');
+            return redirect('/purchase/' . $item->id);
         }
     }
 }
-        /*
-        $user = Auth::user();
-        $paymentMethod = $request->input('payment_method');
-        $shippingAddressData = session('shipping_address');
-        $addressId = null;
-
-        //既に購入済か確認
-        $alreadyPurchased = Purchase::where('buyer_id', $user->id)->where('item_id', $item->id)->exists();
-
-        if ($alreadyPurchased || $item->buyer_id !== null) {
-            //既に購入済の場合、何もしないでリダイレクト
-            return response()->json(['status' => 'success']);
-        }
-
-        DB::beginTransaction();
-
-        try {
-            if ($shippingAddressData) {
-                $shippingAddress = Address::updateOrCreate([
-                    'user_id' => $user->id,
-                    'item_id' => $item->id,
-                ], [
-                    'postal_code' => $shippingAddressData['postal_code'],
-                    'address' => $shippingAddressData['address'],
-                    'building' => $shippingAddressData['building']
-                ]);
-                $addressId = $shippingAddress->id;
-            } else {
-                $profile = $user->profile;
-                $shippingAddress = Address::updateOrCreate([
-                    'user_id' => $user->id,
-                    'item_id' => $item->id,
-                ], [
-                    'postal_code' => $profile->postal_code,
-                    'address' => $profile->address,
-                    'building' => $profile->building
-                ]);
-                $addressId = $shippingAddress->id;
-            }
-
-            $purchaseData = $request->only(['payment_method']);
-            $purchaseData['item_id'] = $item->id;
-            $purchaseData['seller_id'] = $item->user_id;
-            $purchaseData['purchase_price'] = $item->price;
-            $purchaseData['address_id'] = $addressId;
-            $purchaseData['buyer_id'] = $user->id; 
-            
-            Purchase::create($purchaseData);
-
-            session()->forget('shipping_address');
-
-            //商品のbuyer_idを更新し売れきれ状態にする
-            $item->buyer_id = $user->id;
-            $item->save();
-
-            DB::commit();
-
-            return response()->json(['status' => 'success']);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['status' => 'error', 'message' => '購入処理中にエラーが発生しました']);
-        }
-    }*/
-

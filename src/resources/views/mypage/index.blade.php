@@ -37,7 +37,7 @@
                 <span class="profile-image-icon"></span>
             @endif
         </div>
-        <h2 class="profile-username">{{ $user->name }}</h2>
+        <h2 class="profile-username">{{ $user->profile ? $user->profile->name : $user->name }}</h2>
         <a class="profile-edit-button" href="/mypage/profile">プロフィールを編集</a>
     </div>
 

@@ -64,7 +64,7 @@ class ProfileController extends Controller
             }
         }
 
-        $profile->name = $request->input('username');
+        $profile->name = $request->input('name');
         $profile->postal_code = $request->input('postal_code');
         $profile->address = $request->input('address');
         $profile->building = $request->input('building');

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+/*namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -41,4 +41,4 @@ class StripeWebhookController extends Controller
 
     return new Response('Webhook received', 200);
     }
-}
+}*/

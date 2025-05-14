@@ -5,15 +5,6 @@
 @endsection
 
 @section('content')
-        <div class="login-form__alert">
-            @if ($errors->any() && ! $errors->has('email') && ! $errors->has('password'))
-                <div class="login-form__alert--danger">
-                    @foreach ($errors->all() as $error)
-                        {{ $error }}<br>
-                    @endforeach
-                </div>
-            @endif
-        </div>
         <!--<div class="login-form__alert">
             @if ($errors->has('email') && session()->has('auth.password'))
                 <div class="login-form__alert--danger">

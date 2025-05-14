@@ -75,3 +75,8 @@
     cursor: pointer;
     width: 100%;
 }
+
+.error-message {
+    margin-top: 0;
+    color: #FF5555;
+}

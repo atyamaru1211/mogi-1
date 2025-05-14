@@ -149,6 +149,7 @@ return [
         'name' => 'お名前',
         'email' => 'メールアドレス',
         'password' => 'パスワード',
-        'password_confirmation' => '確認用パスワード'
+        'password_confirmation' => '確認用パスワード',
+        'postal_code' => '郵便番号'
     ],
 ];
