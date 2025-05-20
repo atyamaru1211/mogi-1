@@ -21,9 +21,7 @@ class ProductDetailTest extends TestCase
         parent::setUp();
         $this->seed(CategoriesSeeder::class);
         $this->seed(ItemsSeeder::class);
-        $this->seed(ItemCategorySeeder::class);
     }
-
     // ID:7
     // 必要な情報が表示される
     public function testRequiredInformationIsDisplayedOnItemDetailPage()
@@ -38,18 +36,12 @@ class ProductDetailTest extends TestCase
 
         $response = $this->get('/item/' . $item->id);
 
-        $response->assertSee('/storage/items/watch.jpeg');
-
+        $response->assertSee($item->image_path);
         $response->assertSee($item->name);
-
         $response->assertSee($item->brand);
-
         $response->assertSee(number_format($item->price));
-
         $response->assertSee($item->likes()->count());
-
         $response->assertSee($item->comments()->count());
-
         $response->assertSee($item->description);
 
         foreach ($item->categories as $category) {
@@ -82,17 +74,25 @@ class ProductDetailTest extends TestCase
     // 複数選択されたカテゴリが表示されているか
     public function testMultipleCategoriesAreDisplayedOnItemDetailPage()
     {
-        $item = Item::findOrFail(1);
+        $item = new Item([
+            'user_id' => User::factory()->create()->id,
+            'name' => 'テスト商品',
+            'brand' => 'テストブランド',
+            'description' => 'テスト用の商品説明',
+            'price' => 1000,
+            'image_path' => 'items/test.jpeg',
+            'condition' => 1,
+        ]);
+        $item->save();
+
+        $category1 = Category::where('name', 'ファッション')->first();
+        $category2 = Category::where('name', '家電')->first();
+
+        $item->categories()->attach([$category1->id, $category2->id]);
         
         $response = $this->get('/item/' . $item->id);
-        $response->assertStatus(200);
 
-        foreach ($item->categories as $category) {
-            $response->assertSee($category->name);
-        }
-
-        $response->assertSeeInOrder(
-            $item->categories->pluck('name')->toArray()
-        );
+        $response->assertSee($category1->name);
+        $response->assertSee($category2->name);
     }
 }

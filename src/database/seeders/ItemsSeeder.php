@@ -128,7 +128,7 @@ class ItemsSeeder extends Seeder
             ]);
         }
 
-        Item::create([
+        /*Item::create([
             'user_id' => $testUser->id,
             'name' => '自分のテスト商品',
             'brand' => $faker->company(),
@@ -138,6 +138,6 @@ class ItemsSeeder extends Seeder
             'condition' => 1,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ]);*/
     }
 }
