@@ -34,7 +34,7 @@ class ProfileController extends Controller
 
 
     //プロフィール編集画面表示
-    public function edit():View
+    public function edit()
     {
         $user = auth()->user();
         $profile = $user->profile;

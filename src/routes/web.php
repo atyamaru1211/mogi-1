@@ -63,3 +63,5 @@ Route::middleware('auth')->group(function () {
     //コメント送信機能
     Route::post('/item/{item}/comment', [ItemController::class, 'store']);
 });
+
+//

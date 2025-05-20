@@ -112,11 +112,9 @@ class ItemController extends Controller
                             session()->forget('payment_method_type'); // ★ ここで削除
 
                             DB::commit();
-                            \Log::info('購入処理が完了しました (リダイレクト時)');
                             // ★ ここでSold表示などの処理を行う
                         } catch (\Exception $e) {
                             DB::rollback();
-                            \Log::error('購入処理中にエラーが発生しました (リダイレクト時): ' . $e->getMessage());
                         }
                     }
                 }
@@ -149,15 +147,6 @@ class ItemController extends Controller
     {
         $user = Auth::user();
         $liked = $item->likes()->where('user_id', $user->id)->exists();
-
-    /*    if ($liked) {
-            $item->likes()->where('user_id', $user->id)->delete();
-        } else {
-            $like = new Like();
-            $like->user_id = $user->id;
-            $like->item_id = $item->id;
-            $like->save();
-        }*/
 
         if ($liked) {
             $item->likes()->detach($user->id);

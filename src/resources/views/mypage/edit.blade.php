@@ -40,9 +40,7 @@
     </h2>
     <form class="profile-edit-form" action="/mypage/profile" method="POST" enctype="multipart/form-data">
         @csrf
-        @isset($profile)
-            @method('PATCH')
-        @endisset
+        @method('PATCH')
         <div class="form-group">
             <div class="image-upload">
                 <div class="profile-image-preview" style="@isset($profile) background-image: url('{{ asset($profile->profile_image_path) }}'); @endisset"></div>

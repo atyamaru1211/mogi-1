@@ -19,8 +19,12 @@ class ItemsSeeder extends Seeder
     {
         $faker = Faker::create('ja_JP');
 
+        $testUser = User::factory()->create();
+
         $itemData = [
             [
+                'id' => 1,
+                'user_id' => User::factory()->create()->id,
                 'name' => '腕時計',
                 'price' => '15000',
                 'description' => 'スタイリッシュなデザインのメンズ腕時計',
@@ -28,6 +32,8 @@ class ItemsSeeder extends Seeder
                 'condition' => '1',
             ],
             [
+                'id' => 2,
+                'user_id' => User::factory()->create()->id,
                 'name' => 'HDD',
                 'price' => '5000',
                 'description' => '高速で信頼性の高いハードディスク',
@@ -35,6 +41,8 @@ class ItemsSeeder extends Seeder
                 'condition' => '2',
             ],
             [
+                'id' => 3,
+                'user_id' => User::factory()->create()->id,
                 'name' => '玉ねぎ3束',
                 'price' => '300',
                 'description' => '新鮮な玉ねぎの3束のセット',
@@ -42,6 +50,8 @@ class ItemsSeeder extends Seeder
                 'condition' => '3',
             ],
             [
+                'id' => 4,
+                'user_id' => User::factory()->create()->id,
                 'name' => '革靴',
                 'price' => '4000',
                 'description' => 'クラシックなデザインの革靴',
@@ -49,6 +59,8 @@ class ItemsSeeder extends Seeder
                 'condition' => '4',
             ],
             [
+                'id' => 5,
+                'user_id' => User::factory()->create()->id,
                 'name' => 'ノートPC',
                 'price' => '45000',
                 'description' => '高性能なノートパソコン',
@@ -56,6 +68,8 @@ class ItemsSeeder extends Seeder
                 'condition' => '1',
             ],
             [
+                'id' => 6,
+                'user_id' => User::factory()->create()->id,
                 'name' => 'マイク',
                 'price' => '8000',
                 'description' => '高音質のレコーディング用マイク',
@@ -63,6 +77,8 @@ class ItemsSeeder extends Seeder
                 'condition' => '2',
             ],
             [
+                'id' => 7,
+                'user_id' => User::factory()->create()->id,
                 'name' => 'ショルダーバッグ',
                 'price' => '3500',
                 'description' => 'おしゃれなショルダーバッグ',
@@ -70,6 +86,8 @@ class ItemsSeeder extends Seeder
                 'condition' => '3',
             ],
             [
+                'id' => 8,
+                'user_id' => User::factory()->create()->id,
                 'name' => 'タンブラー',
                 'price' => '500',
                 'description' => '使いやすいタンブラー',
@@ -77,6 +95,8 @@ class ItemsSeeder extends Seeder
                 'condition' => '4',
             ],
             [
+                'id' => 9,
+                'user_id' => User::factory()->create()->id,
                 'name' => 'コーヒーミル',
                 'price' => '4000',
                 'description' => '手動のコーヒーミル',
@@ -84,6 +104,8 @@ class ItemsSeeder extends Seeder
                 'condition' => '1',
             ],
             [
+                'id' => 10,
+                'user_id' => User::factory()->create()->id,
                 'name' => 'メイクセット',
                 'price' => '2500',
                 'description' => '便利なメイクアップセット',
@@ -105,5 +127,17 @@ class ItemsSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
+
+        Item::create([
+            'user_id' => $testUser->id,
+            'name' => '自分のテスト商品',
+            'brand' => $faker->company(),
+            'description' => 'テストユーザーが出品した商品です。',
+            'price' => 1000,
+            'image_path' => 'items/own_test.jpeg',
+            'condition' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use App\Http\Requests\RegisterRequest;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
@@ -53,7 +54,7 @@ class CustomRegisteredUserController extends Controller
      * @param  \Laravel\Fortify\Contracts\CreatesNewUsers  $creator
      * @return \Laravel\Fortify\Contracts\RegisterResponse
      */
-    public function store(Request $request,
+    public function store(RegisterRequest $request,
                           CreatesNewUsers $creator): RegisterResponse
     {
         if (config('fortify.lowercase_usernames')) {
@@ -62,12 +63,19 @@ class CustomRegisteredUserController extends Controller
             ]);
         }
 
-        $user = $creator->create($request->all()); // ★ ユーザーを作成
-        event(new Registered($user)); // ★ 作成された $user を渡す
+        $user = $creator->create($request->validated());
+        event(new Registered($user));
+
+        return app(RegisterResponse::class);
+
+        //return redirect('/email/verify/notice');
+    }
+        //$user = $creator->create($request->all()); // ★ ユーザーを作成
+        //event(new Registered($user)); // ★ 作成された $user を渡す
 
         //Auth::login($user);
 
-        return new class implements RegisterResponse { // ★ 無名クラスで RegisterResponse を実装
+        /*return new class implements RegisterResponse { // ★ 無名クラスで RegisterResponse を実装
             public function toResponse($request): SymfonyResponse
             {
                 return redirect('/email/verify/notice');
@@ -77,10 +85,10 @@ class CustomRegisteredUserController extends Controller
             {
                 return new JsonResponse('', 204);
             }
-        };
+        };*/
         //return redirect('/email/verify/notice');
         //return app(RegisterResponse::class);
-    }
+
 
     //protected function registered(Request $request, $user)
     //{

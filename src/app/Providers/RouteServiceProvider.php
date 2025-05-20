@@ -67,13 +67,7 @@ class RouteServiceProvider extends ServiceProvider
         if (Auth::check() && Auth::user()->hasVerifiedEmail()) {
             return '/';
         }
-        /*if (Auth::check()) {
-            if (Session::get('just_registered')) {
-                Session::forget('just_registered'); 
-                return self::HOME; 
-            }
-            return '/'; 
-        }*/
+
         return '/login';
     }
 }
