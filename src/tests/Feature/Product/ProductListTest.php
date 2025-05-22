@@ -59,19 +59,22 @@ class ProductListTest extends TestCase
     // 自分が出品した商品は表示されない
     public function testOwnItemsAreNotDisplayedInList()
     {
-        $this->seed(ItemsSeeder::class);
-
-        $user = User::first();
+        $user = User::factory()->create();
         $this->actingAs($user);
 
-        $ownItem = Item::where('user_id', $user->id)->where('name', '自分のテスト商品')->first();
+        $ownItem = Item::create([
+            'user_id' => $user->id,
+            'name' => 'テスト_自分の出品商品',
+            'description' => 'これは自分が出品したテスト商品です。',
+            'price' => 5000,
+            'condition' => 1,
+            'image_path' => 'my_test_item.jpg',
+        ]);
 
         $response = $this->get('/');
 
-        if ($ownItem) {
-            $response->assertDontSee('<p class="product-detail__item">' . e($ownItem->name) . '</p>');
-            $response->assertDontSee('<img class="product-img" src="' . asset('storage/' . $ownItem->image_path) . '" alt="' . e($ownItem->name) . '">');
-        
-        }
+        $response->assertDontSee($ownItem->name);
+        $response->assertDontSee('src="' . asset('storage/' . $ownItem->image_path) . '"');
+        $response->assertDontSee('alt="' . e($ownItem->name) . '"');
     }
 }

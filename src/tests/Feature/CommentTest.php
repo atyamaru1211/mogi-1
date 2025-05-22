@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Item;
 use App\Models\User;
+use App\Models\Comment;
 use Database\Seeders\ItemsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -61,20 +62,61 @@ class CommentTest extends TestCase
     // コメントが入力されていない場合、バリデーションメッセージが表示される
     public function testCommentContentIsRequired()
     {
-        $item = Item::first();
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->post("/item/{item}/comment", [
-            'content' => '',
+        $item = Item::create([
+            'user_id' => $user->id, 
+            'name' => 'テスト商品',
+            'description' => 'これはテスト用の商品説明です。',
+            'price' => 1000,
+            'condition' => 1,
+            'image_path' => 'dummy_image.jpg',
+        ]);
+        
+        $this->get("/item/{$item->id}");
+
+        $response = $this->post("/item/{$item->id}/comment", [ 
+            'content' => '', 
         ]);
 
-        $response->assertRedirect('/item/' . $item->id); // 具体的な ID を使用
+        $response->assertRedirect("/item/" . $item->id);
+
         $response->assertSessionHasErrors('content');
-        $response->assertSee('商品コメントを入力してください');
-        //$this->assertStringContainsString('商品コメントを入力してください', session('errors')->first('content'));
-        //$this->assertEquals(session('errors')->first('content'), '商品コメントを入力してください');
-        //$response->assertSee('商品コメントを入力してください');
-        //$response->assertInvalid(['content', '商品コメントを入力してください']);
+
+        $followedResponse = $this->followRedirects($response);
+        $followedResponse->assertSeeText('商品コメントを入力してください'); 
+    }
+
+    // コメントが255文字の場合、バリデーションメッセージが表示される
+    public function testCommentContentHasMaxLengthValidation()
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $item = Item::create([
+            'user_id' => $user->id,
+            'name' => 'テスト商品',
+            'description' => 'これはテスト用の商品説明です。',
+            'price' => 1000,
+            'condition' => 1,
+            'image_path' => 'dummy_image.jpg',
+        ]);
+
+        $longCommentContent = str_repeat('あ', 256);
+
+        $this->get("/item/{$item->id}");
+
+        $response = $this->post("/item/{$item->id}/comment", [
+            'content' => $longCommentContent,
+        ]);
+
+        $response->assertSessionHasErrors('content');
+
+        $response->assertRedirect("/item/{$item->id}");
+
+        $followedResponse = $this->followRedirects($response);
+
+        $followedResponse->assertSeeText('商品コメントは255文字以内で入力してください');
     }
 }

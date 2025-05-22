@@ -62,23 +62,25 @@ class MylistTest extends TestCase
     // 自分が出品した商品は表示されない
     public function testOwnItemsAreNotDisplayedOnMylist()
     {
-        $this->seed(ItemsSeeder::class);
-
-        $seller = User::first();
+        $seller = User::factory()->create();
         $this->actingAs($seller);
 
-        $likedOwnItem = Item::where('user_id', $seller->id)->first();
+        $ownItem = Item::create([
+            'user_id' => $seller->id,
+            'name' => '私の出品商品',
+            'description' => 'これは私が出品した商品です。',
+            'price' => 2000,
+            'condition' => 1,
+            'image_path' => 'my_item.jpg',
+        ]);
 
-        if ($likedOwnItem) {
-            $seller->likes()->attach($likedOwnItem->id);
-        }
+        $seller->likes()->attach($ownItem->id);
 
         $response = $this->get('/?tab=mylist');
 
-        if ($likedOwnItem) {
-            $response->assertDontSee($likedOwnItem->name);
-            $response->assertDontSee('<img src="' . asset('storage/' . $likedOwnItem->image_path) . '"');
-        }
+        $response->assertDontSee($ownItem->name);
+        $response->assertDontSee('<img src="' . asset('storage/' . $ownItem->image_path) . '"');
+
     }
 
     // 未認証の場合は何も表示されない

@@ -139,7 +139,6 @@ class ItemController extends Controller
         ];
 
         return view('item.show', $data);
-        //return view('item.show', compact('item'));
     }
 
     //いいね機能
@@ -166,6 +165,7 @@ class ItemController extends Controller
         $comment->content = $request->input('content');
         $comment->save();
 
-        return back();
+        return redirect("/item/{$item->id}");
+        //return back();
     }
 }

@@ -11,9 +11,8 @@ use App\Http\Requests\AddressRequest;
 use App\Http\Requests\PurchaseRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Stripe\Checkout\Session; //★
-use Stripe\Stripe; //★
-use Illuminate\Support\Facades\Log; // ★この行を追加してください！★
+use Stripe\Checkout\Session;
+use Stripe\Stripe; 
 
 
 class PurchaseController extends Controller
@@ -111,24 +110,15 @@ class PurchaseController extends Controller
 
     public function purchaseSuccess(Item $item)
     {
-        Log::info('--- purchaseSuccessメソッド開始 ---');
-        Log::info('アイテムID: ' . $item->id);
-        Log::info('認証済みユーザーID: ' . (Auth::check() ? Auth::user()->id : '未認証'));
-
-
         $user = Auth::user();
         $shippingAddressData = session('shipping_address');
         $paymentMethodType = session('payment_method_type');
-
-        Log::info('セッションデータ - shipping_address: ', $shippingAddressData ?? ['null']);
-        Log::info('セッションデータ - payment_method_type: ' . ($paymentMethodType ?? 'null'));
 
         $addressId = null;
 
         DB::beginTransaction();
         try {
             if ($shippingAddressData) {
-                Log::info('shipping_address セッションが存在します。');
                 $shippingAddress = Address::updateOrCreate([
                     'user_id' => $user->id,
                     'item_id' => $item->id,
@@ -138,10 +128,7 @@ class PurchaseController extends Controller
                     'building' => $shippingAddressData['building']
                 ]);
                 $addressId = $shippingAddress->id;
-                Log::info('Address::updateOrCreate (shippingAddressData): ', $shippingAddress->toArray());
             } else {
-                // セッションに配送先データがない場合（テストのケース）
-                Log::info('shipping_address セッションが存在しません。Profileからアドレスを取得します。');
                 $profile = $user->profile;
                 $shippingAddress = Address::updateOrCreate([
                     'user_id' => $user->id,
@@ -152,10 +139,7 @@ class PurchaseController extends Controller
                     'building' => $profile->building
                 ]);
                 $addressId = $shippingAddress->id;
-                Log::info('Address::updateOrCreate (Profile): ', $shippingAddress->toArray());
             }
-
-            Log::info('最終的な addressId: ' . ($addressId ?? 'null'));
 
             $purchase = Purchase::create([
                 'item_id' => $item->id,
@@ -165,20 +149,15 @@ class PurchaseController extends Controller
                 'buyer_id' => $user->id,
                 'payment_method' => $paymentMethodType === 'konbini' ? 'コンビニ払い' : 'カード払い', 
             ]);
-            Log::info('Purchaseレコードが作成されました: ', $purchase->toArray());
 
             session()->forget('shipping_address');
             session()->forget('payment_method_type');
-            Log::info('セッションデータがクリアされました。');
 
             DB::commit();
-            Log::info('DBトランザクションがコミットされました。');
 
             return redirect('/item/' . $item->id);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Purchaseレコードの作成に失敗し、DBトランザクションがロールバックされました。エラー: ' . $e->getMessage());
-            Log::error('StackTrace: ' . $e->getTraceAsString());
             return redirect('/purchase/' . $item->id);
         }
     }
