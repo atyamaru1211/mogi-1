@@ -8,7 +8,6 @@ use App\Models\Item;
 use App\Models\User;
 use Database\Seeders\CategoriesSeeder;
 use Database\Seeders\ItemsSeeder;
-use Database\Seeders\ItemCategorySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,12 +15,6 @@ class ProductDetailTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->seed(CategoriesSeeder::class);
-        $this->seed(ItemsSeeder::class);
-    }
     // ID:7
     // 必要な情報が表示される
     public function testRequiredInformationIsDisplayedOnItemDetailPage()
@@ -74,6 +67,7 @@ class ProductDetailTest extends TestCase
     // 複数選択されたカテゴリが表示されているか
     public function testMultipleCategoriesAreDisplayedOnItemDetailPage()
     {
+        $this->seed(CategoriesSeeder::class);
         $item = new Item([
             'user_id' => User::factory()->create()->id,
             'name' => 'テスト商品',

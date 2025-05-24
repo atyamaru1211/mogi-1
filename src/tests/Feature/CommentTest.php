@@ -37,14 +37,13 @@ class CommentTest extends TestCase
 
         $response = $this->get('/item/' . $item->id);
         $response->assertSee('(1)');
-
-        $response = $this->get('/item/' . $item->id);
         $response->assertSee($commentContent);
     }
 
     // ログイン前のユーザーはコメントを送信できない
     public function testGuestUserCannotSubmitComment()
     {
+        $this->seed(ItemsSeeder::class);
         $item = Item::first();
 
         $commentContent = 'テストコメント';

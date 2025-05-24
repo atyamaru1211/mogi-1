@@ -9,9 +9,7 @@ use App\Models\Profile;
 use App\Models\Purchase;
 use Database\Seeders\ItemsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
-use Stripe\Checkout\Session;
 
 class PurchaseItemTest extends TestCase
 {
@@ -54,15 +52,6 @@ class PurchaseItemTest extends TestCase
         ]);
 
         $response->assertRedirectContains('https://checkout.stripe.com');
-
-        $this->withSession([
-            'payment_method_type' => $paymentMethod,
-            'shipping_address' => [
-                'postal_code' => $buyer->profile->postal_code,
-                'address' => $buyer->profile->address,
-                'building' => $buyer->profile->building,
-            ]
-        ]);
 
         $purchase = Purchase::where('item_id', $item->id)
                             ->where('buyer_id', $buyer->id)

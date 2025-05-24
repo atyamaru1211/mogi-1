@@ -12,7 +12,7 @@ class ProductSearchTest extends TestCase
 {
     use DatabaseTransactions;
 
-    // 商品検索機能
+    // ID:6 商品検索機能
     // 「商品名」で部分一致検索ができる
     public function testCanSearchProductsByNameWithPartialMatch()
     {
@@ -79,9 +79,16 @@ class ProductSearchTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $blueBook = Item::where('name', 'like', '%青い本%')->first();
-        $redBook = Item::where('name', 'like', '%赤い本%')->first();
-        $bluePen = Item::where('name', 'like', '%青いペン%')->first();
+        $likedBlueBook = Item::where('name', 'like', '%青い本%')->first();
+        $likedRedBook = Item::where('name', 'like', '%赤い本%')->first();
+        $likedBluePen = Item::where('name', 'like', '%青いペン%')->first();
+
+        if ($likedBlueBook) {
+            $user->likes()->attach($likedBlueBook->id);
+        }
+        if ($likedBluePen) {
+            $user->likes()->attach($likedBluePen->id);
+        }
 
         $searchKeyword = '青い';
         $response = $this->get('/?keyword=' . $searchKeyword);
@@ -92,18 +99,13 @@ class ProductSearchTest extends TestCase
 
         $likedItemIds = $user->likes()->pluck('item_id');
 
-        if ($blueBook && $likedItemIds->contains($blueBook->id)) {
-            $response->assertSee($blueBook->name);
-            $response->assertSee('<img src="' . asset('storage/' . $blueBook->image_path) . '"');
+        if ($likedBlueBook) {
+            $response->assertSee($likedBlueBook->name);
+            $response->assertSee('<img src="' . asset('storage/' . $likedBlueBook->image_path) . '"', false);
         }
-        if ($bluePen && $likedItemIds->contains($bluePen->id)) {
-            $response->assertSee($bluePen->name);
-            $response->assertSee('<img src="' . asset('storage/' . $bluePen->image_path) . '"');
-        }
-        if ($redBook && $likedItemIds->contains($redBook->id)) {
-            $response->assertDontSee($redBook->name);
-            $response->assertDontSee('<img src="' . asset('storage/' . $redBook->image_path) . '"');
+        if ($likedBluePen) {
+            $response->assertSee($likedBluePen->name);
+            $response->assertSee('<img src="' . asset('storage/' . $likedBluePen->image_path) . '"', false);
         }
     }
-
 }

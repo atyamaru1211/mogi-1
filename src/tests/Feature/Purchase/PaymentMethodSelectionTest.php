@@ -4,7 +4,6 @@ namespace Tests\Feature\Purchase;
 
 use App\Models\Item;
 use App\Models\User;
-use App\Models\Address;
 use App\Models\Profile;
 use Database\Seeders\ItemsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;

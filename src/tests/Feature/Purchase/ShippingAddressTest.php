@@ -10,13 +10,12 @@ use App\Models\Purchase;
 use Database\Seeders\ItemsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Session;
 
 class ShippingAddressTest extends TestCase
 {
     use RefreshDatabase;
 
-    // ID: 送付先住所変更機能
+    // ID:12 配送先住所変更機能
     // 送付先住所変更画面にて登録した住所が商品購入画面に反映される
     public function testRegisteredAddressIsReflectedOnPurchaseScreen()
     {
@@ -105,7 +104,6 @@ class ShippingAddressTest extends TestCase
         $expectedAddressId = $registeredAddress->id;
 
         $paymentMethod = 'card';
-        Session::put('payment_method_type', $paymentMethod);
 
         $responseCheckout = $this->post("/purchase/{$item->id}/checkout", [
             'payment_method' => $paymentMethod,

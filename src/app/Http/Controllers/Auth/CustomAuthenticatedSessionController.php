@@ -37,7 +37,7 @@ class CustomAuthenticatedSessionController extends Controller
     
         $request->session()->regenerate();
     
-        return redirect('/');//->intended(RouteServiceProvider::HOME);
+        return redirect('/');
     }
 
     // ログアウト処理
