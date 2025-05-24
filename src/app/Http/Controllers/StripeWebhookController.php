@@ -36,7 +36,7 @@ class StripeWebhookController extends Controller
     } elseif ($event->type === 'payment_intent.succeeded') {
         $paymentIntent = $event->data->object;
         Log::info('Payment Intent Succeeded:', ['id' => $paymentIntent->id]);
-        // ここで購入処理などを行う (コンビニ払いなど)
+        // ここで購入処理などを行う (コンビニ支払いなど)
     }
 
     return new Response('Webhook received', 200);

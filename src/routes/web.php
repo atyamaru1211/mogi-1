@@ -53,7 +53,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/purchase/{item}', [PurchaseController::class, 'show']);
 
     //商品購入処理
-    Route::post('/purchase/{item}', [PurchaseController::class, 'purchase']);
+    Route::post('/purchase/{item}', [PurchaseController::class, 'updateDisplay']); //Route::post('/purchase/{item}', [PurchaseController::class, 'purchase']);
+    Route::post('/purchase/{item}/checkout', [PurchaseController::class, 'purchase']);// ★
     Route::get('/item/{item}/purchased', [PurchaseController::class, 'purchaseSuccess']);
 
     //配送先住所変更画面の表示
@@ -64,4 +65,3 @@ Route::middleware('auth')->group(function () {
     Route::post('/item/{item}/comment', [ItemController::class, 'store']);
 });
 
-//

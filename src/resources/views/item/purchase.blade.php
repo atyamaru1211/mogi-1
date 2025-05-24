@@ -30,8 +30,6 @@
 @endsection
 
 @section('content')
-<form action="/purchase/{{ $item->id }}" method="POST">
-    @csrf
     <div class="purchase-container">
         <div class="purchase-left">
             <section class="item-section">
@@ -46,21 +44,26 @@
                     </p>
                 </div>
             </section>
-            <section class="payment-section">
-                <h3 class="payment-section__title">支払い方法</h3>
-                <div class="payment__select-inner">
-                    <select class="payment__select" name="payment_method" id="payment_method">
-                        <option data-display="選択してください" value="">選択してください</option>
-                        <option data-display="コンビニ払い" value="konbini" {{ old('payment_method') == 'konbini' ? 'selected' : '' }}>コンビニ払い</option>
-                        <option data-display="カード払い" value="card" {{ old('payment_method') == 'card' ? 'selected' : '' }}>カード払い</option>
-                    </select>
-                </div>
-                <p class="error-message">
-                    @error('payment_method')
-                    {{ $message }}
-                    @enderror
-                </p>
-            </section>
+
+            <form action="/purchase/{{ $item->id }}" method="POST" id="payment-selection-form">
+                @csrf
+
+                <section class="payment-section">
+                    <h3 class="payment-section__title">支払い方法</h3>
+                    <div class="payment__select-inner">
+                        <select class="payment__select" name="payment_method" id="payment_method"  onchange="this.form.submit()">
+                            <option data-display="選択してください" value="">選択してください</option>
+                            <option data-display="コンビニ支払い" value="konbini" {{ old('payment_method') == 'konbini' ? 'selected' : '' }}>コンビニ支払い</option>
+                            <option data-display="カード支払い" value="card" {{ old('payment_method') == 'card' ? 'selected' : '' }}>カード支払い</option>
+                        </select>
+                    </div>
+                    <p class="error-message">
+                        @error('payment_method')
+                        {{ $message }}
+                        @enderror
+                    </p>
+                </section>
+            </form>
             <section class="shipping-section">
                 <h3 class="shipping-section__title">配送先</h3>
                 <div class="shipping-address">
@@ -86,6 +89,7 @@
                 </div>
             </section>
         </div>
+
         <div class="purchase-right">
             <section class="summary-section">
                 <div class="summary-details">
@@ -96,137 +100,37 @@
                     <div class="divider"></div>
                     <p class="summary-details__payment">
                         <span class="payment__lavel">支払い方法</span>
-                        <span class="payment__value"></span>
+                        <span class="payment__value">
+                            @php
+                                $selectedMethod = old('payment_method');
+                                $displayText = '';
+                                if ($selectedMethod === 'konbini') {
+                                    $displayText = 'コンビニ支払い';
+                                } elseif ($selectedMethod === 'card') {
+                                    $displayText = 'カード支払い';
+                                }
+                            @endphp
+                            {{ $displayText }}
+                        </span>
                     </p>
                 </div>
             </section>
-            <button class="purchase-button" type="submit">購入する</button>
+            <form action="/purchase/{{ $item->id }}/checkout" method="POST"> <!---->
+                @csrf
+                <button class="purchase-button" type="submit">購入する</button>
+                <input type="hidden" name="address_existence" value="exists">
+                <input type="hidden" name="payment_method" value="{{ old('payment_method') }}"><!---->
+                @php
+                    $hasShippingAddress = false;
+                    if (isset($shippingAddress) && !empty($shippingAddress['address'])) {
+                        $hasShippingAddress = true;
+                    } elseif (isset($profile) && !empty($profile->address)) {
+                        $hasShippingAddress = true;
+                    }
+                @endphp
+                <input type="hidden" name="purchase_price" value="{{ $item->price }}"><!---->
+            </form>
         </div>
     </div>
-    <input type="hidden" name="address_existence" value="exists">
-</form>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const paymentSelect = document.querySelector('.payment__select');
-    const paymentOptions = paymentSelect.querySelectorAll('option');
-    const paymentValueSpan = document.querySelector('.summary-details__payment .payment__value');
-    const purchaseForm = document.querySelector('form');
-    const purchaseButton = document.querySelector('.purchase-button'); // クラス名が正しいことを確認
-
-    const oldPaymentMethod = paymentSelect.dataset.oldPayment;
-
-    if (oldPaymentMethod) {
-        paymentSelect.value = oldPaymentMethod;
-    }
-
-    paymentValueSpan.textContent = paymentSelect.options[paymentSelect.selectedIndex].textContent;
-    paymentSelect.addEventListener('change', function() {
-        paymentOptions.forEach(option => {
-            option.textContent = option.textContent.replace('✓ ', '');
-        });
-        const selectedOption = this.options[this.selectedIndex];
-        selectedOption.textContent = '✓ ' + selectedOption.textContent;
-        paymentValueSpan.textContent = selectedOption.textContent.replace('✓ ', '');
-    });
-
-    const initialValue = paymentSelect.value;
-    paymentOptions.forEach(option => {
-        if (option.value === initialValue && initialValue !== '') {
-            option.textContent = '✓ ' + option.textContent;
-        }
-    });
-
-    purchaseForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const formData = new FormData(this);
-
-        fetch(this.action, {
-            method: this.method,
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': formData.get('_token')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                purchaseButton.textContent = 'Sold';
-                purchaseButton.disabled = true;
-                purchaseButton.classList.add('purchase-button--sold'); // CSSクラスを追加
-            } else {
-                console.error('購入失敗:', data);
-                alert('購入に失敗しました。もう一度お試しください。');
-            }
-        })
-        .catch(error => {
-            console.error('通信エラー:', error);
-            alert('通信エラーが発生しました。');
-        });
-    });
-});
-</script>
-<!--<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const paymentSelect = document.querySelector('.payment__select');
-    const paymentOptions = paymentSelect.querySelectorAll('option');
-    const paymentValueSpan = document.querySelector('.summary-details__payment .payment__value');
-    const purchaseForm = document.querySelector('form');
-    const purchaseButton = document.querySelector('.purchase-button'); // クラス名が正しいことを確認
-
-    const oldPaymentMethod = paymentSelect.dataset.oldPayment;
-
-    if (oldPaymentMethod) {
-        paymentSelect.value = oldPaymentMethod;
-    }
-
-    paymentValueSpan.textContent = paymentSelect.options[paymentSelect.selectedIndex].textContent;
-    paymentSelect.addEventListener('change', function() {
-        paymentOptions.forEach(option => {
-            option.textContent = option.textContent.replace('✓ ', '');
-        });
-        const selectedOption = this.options[this.selectedIndex];
-        selectedOption.textContent = '✓ ' + selectedOption.textContent;
-        paymentValueSpan.textContent = selectedOption.textContent.replace('✓ ', '');
-    });
-
-    const initialValue = paymentSelect.value;
-    paymentOptions.forEach(option => {
-        if (option.value === initialValue && initialValue !== '') {
-            option.textContent = '✓ ' + option.textContent;
-        }
-    });
-
-    purchaseForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const formData = new FormData(this);
-
-        fetch(this.action, {
-            method: this.method,
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': formData.get('_token')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                purchaseButton.textContent = 'Sold';
-                purchaseButton.disabled = true;
-                purchaseButton.classList.add('purchase-button--sold'); // CSSクラスを追加
-            } else {
-                console.error('購入失敗:', data);
-                alert('購入に失敗しました。もう一度お試しください。');
-            }
-        })
-        .catch(error => {
-            console.error('通信エラー:', error);
-            alert('通信エラーが発生しました。');
-        });
-    });
-});
-</script>-->
 
 @endsection

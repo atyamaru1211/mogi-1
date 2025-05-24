@@ -6,6 +6,7 @@ use App\Models\Item;
 use App\Models\User;
 use App\Models\Address;
 use App\Models\Profile;
+use App\Models\Purchase;
 use Database\Seeders\ItemsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -100,14 +101,26 @@ class ShippingAddressTest extends TestCase
         $registeredAddress = Address::where('user_id', $buyer->id)
                                     ->where('item_id', $item->id)
                                     ->first();
+        
         $expectedAddressId = $registeredAddress->id;
 
         $paymentMethod = 'card';
         Session::put('payment_method_type', $paymentMethod);
 
-        $response = $this->actingAs($buyer)->get("/item/{$item->id}/purchased");
+        $responseCheckout = $this->post("/purchase/{$item->id}/checkout", [
+            'payment_method' => $paymentMethod,
+            'purchase_price' => $item->price,
+            'address_existence' => 'exists',
+        ]);
 
-        $response->assertRedirect("/item/{$item->id}");
+        $responseCheckout->assertRedirectContains('https://checkout.stripe.com');
+
+        $purchase = Purchase::where('item_id', $item->id)
+                            ->where('buyer_id', $buyer->id)
+                            ->first();
+        $responseAfterStripe = $this->actingAs($buyer)->get("/item/{$item->id}/purchased?purchase_id={$purchase->id}");
+
+        $responseAfterStripe->assertRedirect("/item/{$item->id}");
 
         $this->assertDatabaseHas('purchases', [
             'item_id' => $item->id,
@@ -115,7 +128,7 @@ class ShippingAddressTest extends TestCase
             'seller_id' => $seller->id,
             'purchase_price' => $item->price,
             'address_id' => $expectedAddressId,
-            'payment_method' => $paymentMethod === 'konbini' ? 'コンビニ払い' : 'カード払い',
+            'payment_method' => $paymentMethod,
         ]);
     }
 }

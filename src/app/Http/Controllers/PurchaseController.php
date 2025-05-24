@@ -26,7 +26,7 @@ class PurchaseController extends Controller
         if ($user) {
             $profile = $user->profile;
         }
-
+    
         $data = [
             'item' => $item,
             'user' => $user,
@@ -66,89 +66,110 @@ class PurchaseController extends Controller
         return redirect('/purchase/' . $item->id);
     }
 
+    public function updateDisplay(Request $request, Item $item) // ここが Request $request になります
+    {
+        $request->validate([
+            'payment_method' => ['required'],
+        ], [
+            'payment_method.required' => '支払い方法を選択してください',
+        ]);
+        return redirect('/purchase/' . $item->id)->withInput();
+    }
 
     public function purchase(PurchaseRequest $request, Item $item)
     {
+        $user = Auth::user();
         $paymentMethod = $request->input('payment_method');
+        $shippingAddress = session('shipping_address');
+        $profile = $user->profile;
 
-        Stripe::setApiKey(config('services.stripe.secret'));
-
-        $lineItems = [
-            [
-                'price_data' => [
-                    'currency' => 'jpy',
-                    'unit_amount' => $item->price,
-                    'product_data' => [
-                        'name' => $item->name,
-                    ],
-                ],
-                'quantity' => 1,
-            ],
-        ];
-
-        $checkoutParams = [
-            'line_items' => $lineItems,
-            'mode' => 'payment',
-            'success_url' => url('/item/' . $item->id. '/purchased'), 
-        ];
-
-        if ($paymentMethod === 'konbini') {
-            $checkoutParams['payment_method_types'] = ['konbini'];
-            session(['payment_method_type' => 'konbini']);
-        } elseif ($paymentMethod === 'card') {
-            $checkoutParams['payment_method_types'] = ['card'];
-            session(['payment_method_type' => 'card']);
-        }
-
+        DB::beginTransaction();
         try {
+            if ($shippingAddress && !empty($shippingAddress['address'])) {
+                $address = Address::updateOrCreate(
+                    ['user_id' => $user->id, 'item_id' => $item->id],
+                    ['postal_code' => $shippingAddress['postal_code'], 'address' => $shippingAddress['address'], 'building' => $shippingAddress['building']]
+                );
+                $addressId = $address->id;
+            } elseif ($profile && !empty($profile->address)) {
+                $address = Address::updateOrCreate(
+                    ['user_id' => $user->id, 'item_id' => $item->id],
+                    ['postal_code' => $profile->postal_code, 'address' => $profile->address, 'building' => $profile->building]
+                );
+                $addressId = $address->id;
+            } else {
+                DB::rollback();
+                return redirect('/purchase/' . $item->id);
+            }
+
+            $purchase = Purchase::create([
+                'item_id' => $item->id,
+                'buyer_id' => $user->id,
+                'seller_id' => $item->user_id,
+                'address_id' => $addressId,
+                'purchase_price' => $item->price,
+                'payment_method' => $paymentMethod,
+            ]);
+
+            session()->forget('shipping_address');
+            session(['payment_method_type' => $paymentMethod]);
+
+            DB::commit();
+
+            Stripe::setApiKey(config('services.stripe.secret'));
+
+            $lineItems = [
+                [
+                    'price_data' => [
+                        'currency' => 'jpy',
+                        'unit_amount' => $item->price, // Stripeは最小単位（円の場合、1円 = 1）で指定
+                        'product_data' => [
+                            'name' => $item->name,
+                        ],
+                    ],
+                    'quantity' => 1,
+                ],
+            ];
+
+            $checkoutParams = [
+                'line_items' => $lineItems,
+                'mode' => 'payment',
+                'success_url' => url('/item/' . $item->id. '/purchased?purchase_id=' . $purchase->id), 
+            ];
+
+            if ($paymentMethod === 'konbini') {
+                $checkoutParams['payment_method_types'] = ['konbini'];
+            } elseif ($paymentMethod === 'card') {
+                $checkoutParams['payment_method_types'] = ['card'];
+            }
+
             $checkoutSession = Session::create($checkoutParams);
             return redirect()->away($checkoutSession->url);
+
         } catch (\Stripe\Exception\ApiErrorException $e) {
-            return back();
+            DB::rollback(); 
+            return redirect()->back()->withErrors(['stripe_error' => '決済システムでエラーが発生しました。もう一度お試しください。'])->withInput();
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect('/purchase/' . $item->id);
         }
     }
 
-    public function purchaseSuccess(Item $item)
+    public function purchaseSuccess(Request $request, Item $item)
     {
+        $purchaseId = $request->query('purchase_id');
         $user = Auth::user();
-        $shippingAddressData = session('shipping_address');
-        $paymentMethodType = session('payment_method_type');
 
         $addressId = null;
 
         DB::beginTransaction();
         try {
-            if ($shippingAddressData) {
-                $shippingAddress = Address::updateOrCreate([
-                    'user_id' => $user->id,
-                    'item_id' => $item->id,
-                ], [
-                    'postal_code' => $shippingAddressData['postal_code'],
-                    'address' => $shippingAddressData['address'],
-                    'building' => $shippingAddressData['building']
-                ]);
-                $addressId = $shippingAddress->id;
-            } else {
-                $profile = $user->profile;
-                $shippingAddress = Address::updateOrCreate([
-                    'user_id' => $user->id,
-                    'item_id' => $item->id,
-                ], [
-                    'postal_code' => $profile->postal_code,
-                    'address' => $profile->address,
-                    'building' => $profile->building
-                ]);
-                $addressId = $shippingAddress->id;
-            }
+            $purchase = Purchase::find($purchaseId);
 
-            $purchase = Purchase::create([
-                'item_id' => $item->id,
-                'seller_id' => $item->user_id,
-                'purchase_price' => $item->price,
-                'address_id' => $addressId,
-                'buyer_id' => $user->id,
-                'payment_method' => $paymentMethodType === 'konbini' ? 'コンビニ払い' : 'カード払い', 
-            ]);
+            if (!$purchase || $purchase->buyer_id !== $user->id || $purchase->item_id !== $item->id) {
+                DB::rollback();
+                return redirect('/purchase/' . $item->id);
+            }
 
             session()->forget('shipping_address');
             session()->forget('payment_method_type');
@@ -156,6 +177,7 @@ class PurchaseController extends Controller
             DB::commit();
 
             return redirect('/item/' . $item->id);
+
         } catch (\Exception $e) {
             DB::rollback();
             return redirect('/purchase/' . $item->id);

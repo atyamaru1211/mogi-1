@@ -32,7 +32,7 @@ class ProfileDisplayTest extends TestCase
         );
 
         $storedFileName = $profileImage->hashName();
-        $profileImagePath = 'storage/profiles/' . $storedFileName; 
+        $profileImagePath = 'profiles/' . $storedFileName;
 
         Storage::disk('public')->putFileAs('profiles', $profileImage, $storedFileName);
 
@@ -63,11 +63,17 @@ class ProfileDisplayTest extends TestCase
         $addressForBuyItem1 = Address::factory()->create([
             'user_id' => $user->id,
             'item_id' => $buyItem1->id,
+            'postal_code' => '111-2222',
+            'address' => '東京都渋谷区',
+            'building' => 'テストマンション',
         ]);
 
         $addressForBuyItem2 = Address::factory()->create([
             'user_id' => $user->id,
             'item_id' => $buyItem2->id,
+            'postal_code' => '333-4444',
+            'address' => '東京都新宿区',
+            'building' => 'テストビル2',
         ]);
 
         Purchase::factory()->create([
@@ -75,16 +81,16 @@ class ProfileDisplayTest extends TestCase
             'buyer_id' => $user->id,
             'seller_id' => $otherSeller1->id,
             'purchase_price' => $buyItem1->price,
-            'address_id' => 1,
-            'payment_method' => 'カード払い',
+            'address_id' => $addressForBuyItem1->id,
+            'payment_method' => 'カード支払い',
         ]);
         Purchase::factory()->create([
             'item_id' => $buyItem2->id,
             'buyer_id' => $user->id,
             'seller_id' => $otherSeller2->id,
             'purchase_price' => $buyItem2->price,
-            'address_id' => 1,
-            'payment_method' => 'コンビニ払い',
+            'address_id' => $addressForBuyItem2->id,
+            'payment_method' => 'コンビニ支払い',
         ]);
 
         $responseSellTab = $this->get('/mypage?tab=sell');

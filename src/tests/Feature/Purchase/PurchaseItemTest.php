@@ -6,17 +6,19 @@ use App\Models\Item;
 use App\Models\User;
 use App\Models\Address;
 use App\Models\Profile;
+use App\Models\Purchase;
 use Database\Seeders\ItemsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
+use Stripe\Checkout\Session;
 
 class PurchaseItemTest extends TestCase
 {
     use RefreshDatabase;
 
     // ID:10 商品購入機能
-    // 「購入する」ボタンを押下するとstripeの購入処理画面に遷移し、購入処理後、商品詳細画面に遷移
+    // ★「購入する」ボタンを押下するとstripeの購入処理画面に遷移し、購入処理後、商品詳細画面に遷移★　README参照
     public function testUserCanPurchaseItem()
     {
         $buyer = User::factory()->create();
@@ -37,18 +39,17 @@ class PurchaseItemTest extends TestCase
 
         $address = Address::factory()->create([
             'user_id' => $buyer->id,
-            'item_id' => $item->id,
+            'postal_code' => $buyer->profile->postal_code,
+            'address' => $buyer->profile->address,
+            'building' => $buyer->profile->building,
         ]);
 
-        $response = $this->get("/purchase/{$item->id}");
+        $this->get("/purchase/{$item->id}");
 
-        $purchasePrice = $item->price;
         $paymentMethod = 'card';
-
-        $response = $this->post("/purchase/{$item->id}", [
-            'address_id' => $address->id,
+        $response = $this->post("/purchase/{$item->id}/checkout", [
             'payment_method' => $paymentMethod,
-            'purchase_price' => $purchasePrice,
+            'purchase_price' => $item->price,
             'address_existence' => 'exists',
         ]);
 
@@ -56,18 +57,28 @@ class PurchaseItemTest extends TestCase
 
         $this->withSession([
             'payment_method_type' => $paymentMethod,
+            'shipping_address' => [
+                'postal_code' => $buyer->profile->postal_code,
+                'address' => $buyer->profile->address,
+                'building' => $buyer->profile->building,
+            ]
         ]);
 
-        $responseAfterStripe = $this->actingAs($buyer)->get("/item/{$item->id}/purchased");
+        $purchase = Purchase::where('item_id', $item->id)
+                            ->where('buyer_id', $buyer->id)
+                            ->first();
+        
+        $responseAfterStripe = $this->actingAs($buyer)->get("/item/{$item->id}/purchased?purchase_id={$purchase->id}");
+        $responseAfterStripe->assertRedirect("/item/{$item->id}");
 
         $this->assertDatabaseHas('purchases', [
             'item_id' => $item->id,
             'buyer_id' => $buyer->id,
             'seller_id' => $seller->id,
-            'address_id' => $address->id,
-            'purchase_price' => $purchasePrice,
-            'payment_method' => $paymentMethod === 'konbini' ? 'コンビニ払い' : 'カード払い',
+            'purchase_price' => $item->price,
+            'payment_method' => $paymentMethod,
         ]);
+
     }
 
     // 購入した商品は商品一覧画面にて「Sold」と表示される
@@ -91,29 +102,46 @@ class PurchaseItemTest extends TestCase
 
         $address = Address::factory()->create([
             'user_id' => $buyer->id,
-            'item_id' => $item->id,
+            'postal_code' => $buyer->profile->postal_code,
+            'address' => $buyer->profile->address,
+            'building' => $buyer->profile->building,
         ]);
 
-        $response = $this->get("/purchase/{$item->id}");
+        $this->get("/purchase/{$item->id}");
 
-        $purchasePrice = $item->price;
         $paymentMethod = 'card';
 
-        $response = $this->post("/purchase/{$item->id}", [
-            'address_id' => $address->id,
+        $response = $this->post("/purchase/{$item->id}/checkout", [
             'payment_method' => $paymentMethod,
-            'purchase_price' => $purchasePrice,
+            'purchase_price' => $item->price,
             'address_existence' => 'exists',
         ]);
 
-        $this->withSession([
-            'payment_method_type' => $paymentMethod,
-        ])->actingAs($buyer)->get("/item/{$item->id}/purchased");
+        $response->assertRedirectContains('https://checkout.stripe.com');
 
-        $response = $this->get('/');
-        $response->assertSeeText($item->name);
-        $response->assertSee('storage/' . $item->image_path);
-        $response->assertSee('Sold');
+        $purchase = Purchase::where('item_id', $item->id)
+                            ->where('buyer_id', $buyer->id)
+                            ->first();
+
+        $responseAfterStripe = $this->actingAs($buyer)->get("/item/{$item->id}/purchased?purchase_id={$purchase->id}");
+
+        $responseAfterStripe->assertRedirect("/item/{$item->id}");
+
+        $this->assertDatabaseHas('purchases', [
+            'item_id' => $item->id,
+            'buyer_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'purchase_price' => $item->price,
+            'payment_method' => $paymentMethod,
+        ]);
+
+        $item = $item->fresh();
+
+        $indexResponse = $this->get('/');
+
+        $indexResponse->assertSee('storage/' . $item->image_path);
+
+        $indexResponse->assertSee('Sold');
     }
 
     // 「プロフィール/購入した商品一覧」に追加されている
@@ -137,27 +165,41 @@ class PurchaseItemTest extends TestCase
 
         $address = Address::factory()->create([
             'user_id' => $buyer->id,
-            'item_id' => $item->id,
+            'postal_code' => $buyer->profile->postal_code,
+            'address' => $buyer->profile->address,
+            'building' => $buyer->profile->building,
         ]);
 
-        $response = $this->get("/purchase/{$item->id}");
+        $this->get("/purchase/{$item->id}");
 
         $purchasePrice = $item->price;
         $paymentMethod = 'card';
 
-        $response = $this->post("/purchase/{$item->id}", [
-            'address_id' => $address->id,
+        $response = $this->post("/purchase/{$item->id}/checkout", [
             'payment_method' => $paymentMethod,
             'purchase_price' => $purchasePrice,
             'address_existence' => 'exists',
         ]);
 
-        $this->withSession([
-            'payment_method_type' => $paymentMethod,
-        ])->actingAs($buyer)->get("/item/{$item->id}/purchased");
+        $response->assertRedirectContains('https://checkout.stripe.com');
 
-        $response = $this->actingAs($buyer)->get('/mypage?tab=buy');
-        $response->assertSeeText($item->name);
-        $response->assertSee('storage/' . $item->image_path);
+        $latestPurchase = Purchase::where('item_id', $item->id)
+                                  ->where('buyer_id', $buyer->id)
+                                  ->first();
+
+        $responseAfterStripe = $this->actingAs($buyer)->get("/item/{$item->id}/purchased?purchase_id={$latestPurchase->id}");
+        $responseAfterStripe->assertRedirect("/item/{$item->id}");
+
+        $this->assertDatabaseHas('purchases', [
+            'item_id' => $item->id,
+            'buyer_id' => $buyer->id,
+            'seller_id' => $seller->id,
+            'purchase_price' => $purchasePrice,
+            'payment_method' => $paymentMethod,
+        ]);
+
+        $mypageResponse = $this->actingAs($buyer)->get('/mypage?tab=buy');
+        $mypageResponse->assertSeeText($item->name);
+        $mypageResponse->assertSee('storage/' . $item->image_path);
     }
 }

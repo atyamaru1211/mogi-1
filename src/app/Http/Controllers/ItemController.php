@@ -105,7 +105,7 @@ class ItemController extends Controller
                                 'purchase_price' => $item->price,
                                 'address_id' => $addressId,
                                 'buyer_id' => $user->id,
-                                'payment_method' => $paymentMethodType === 'konbini' ? 'コンビニ払い' : 'カード払い',
+                                'payment_method' => $paymentMethodType === 'konbini' ? 'コンビニ支払い' : 'カード支払い',
                             ]);
 
                             session()->forget('shipping_address');
