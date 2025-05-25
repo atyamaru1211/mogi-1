@@ -85,7 +85,7 @@ php artisan migrate --env=testing
 8. シーディングの実行
 ``` bash
 php artisan db:seed --env=testing
-
+```
 
 ## 使用技術(実行環境)
 - PHP 7.4.9
