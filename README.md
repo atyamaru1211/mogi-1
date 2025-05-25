@@ -52,7 +52,7 @@ php artisan migrate
 php artisan db:seed
 ```
 
-**テスト環境構築**　``
+**テスト環境構築**
 1. `docker-compose exec mysql bash`
 2. `mysql -u root -p`　パスワードを要求されたら`root`
 2. `CREATE DATABASE demo_test;`
@@ -72,10 +72,12 @@ DB_PORT=3306
 DB_DATABASE=demo_test
 DB_USERNAME=root
 DB_PASSWORD=root
+```
 
 6. テスト用アプリケーションキーの作成
 ``` bash
 php artisan key:generate --env=testing
+```
 
 7. マイグレーションの実行
 ``` bash
@@ -86,6 +88,14 @@ php artisan migrate --env=testing
 ``` bash
 php artisan db:seed --env=testing
 ```
+
+## 追加機能・変更点（機能要件との差異、運営からのフィードバックを含む）
+本プロジェクトでは、基本の機能要件に加えて以下の変更・追加対応を行いました。
+
+### デザイン・UI関連
+* **デザイン要件のレスポンシブ対応:**
+    * 全般的なレスポンシブ対応に加え、特に**商品購入画面のみUIを一部変更**しております。
+
 
 ## 使用技術(実行環境)
 - PHP 7.4.9

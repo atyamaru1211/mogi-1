@@ -16,7 +16,7 @@ class PurchaseItemTest extends TestCase
     use RefreshDatabase;
 
     // ID:10 商品購入機能
-    // ★「購入する」ボタンを押下するとstripeの購入処理画面に遷移し、購入処理後、商品詳細画面に遷移★　README参照
+    // ★「購入する」ボタンを押下するとstripeの購入処理画面に遷移し、購入処理後、購入が完了する★　README参照
     public function testUserCanPurchaseItem()
     {
         $buyer = User::factory()->create();

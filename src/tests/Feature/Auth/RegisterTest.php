@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Models\User;
 
 class RegisterTest extends TestCase
 {
@@ -84,7 +85,7 @@ class RegisterTest extends TestCase
         $response->assertInvalid(['password_confirmation' => 'パスワードと一致しません']);
     }
 
-    // ★全ての項目が入力されている場合、メール認証誘導画面へ遷移★　README参照
+    // ★全ての項目が入力されている場合、メール認証誘導画面へ遷移、認証後ログイン画面に遷移される★　README参照
     public function testSuccessfulRegistrationAndRedirectionToEmailVerificationNotice()
     {
         $response = $this ->from('/register')
@@ -100,5 +101,13 @@ class RegisterTest extends TestCase
         ]);
 
         $response->assertRedirect('/email/verify/notice');
+
+        $user = User::where('email', 'successful_registration_test@example.com')->first();
+        $user->markEmailAsVerified();
+        $verificationResponse = $this->actingAs($user)->get('/email/verify'); 
+
+        $this->assertTrue($user->fresh()->hasVerifiedEmail());
+     
+        $verificationResponse->assertRedirect('/login');
     }
 }
