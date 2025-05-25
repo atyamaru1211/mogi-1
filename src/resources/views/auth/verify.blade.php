@@ -13,6 +13,7 @@
                 </div>
                 <form class="verify-notice__resend-form" method="POST" action="{{ route('verification.resend') }}">
                     @csrf
+                    <input type="hidden" name="email" value="{{ session('registered_email') }}"> 
                     <button class="verify-notice__resend-link" type="submit">認証メールを再送する</button>
                 </form>
             </div>

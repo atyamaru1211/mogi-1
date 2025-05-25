@@ -90,24 +90,4 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tabLinks = document.querySelectorAll('.tab-menu-nav__link');
-
-        tabLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
-                event.preventDefault(); 
-
-                tabLinks.forEach(tab => {
-                    tab.classList.remove('active');
-                });
-
-                this.classList.add('active');
-
-                window.location.href = this.getAttribute('href');
-            });
-        });
-    });
-</script>
-
 @endsection

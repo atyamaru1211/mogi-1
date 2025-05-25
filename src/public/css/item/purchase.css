@@ -137,17 +137,17 @@
     flex-direction: column;
 }
 
-/**/
+
 .summary-details__payment .payment__value:empty {
     opacity: 0;
-    transition: opacity 0.3s ease-in-out; /* フェードイン・アウトのアニメーション効果 */
+    transition: opacity 0.3s ease-in-out;
 }
 
 .summary-details__payment .payment__value:not(:empty) {
     opacity: 1;
     transition: opacity 0.3s ease-in-out;
 }
-/**/
+
 
 .summary-details__price ,
 .summary-details__payment {

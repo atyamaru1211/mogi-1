@@ -122,7 +122,7 @@ class PurchaseController extends Controller
                 [
                     'price_data' => [
                         'currency' => 'jpy',
-                        'unit_amount' => $item->price, // Stripeは最小単位（円の場合、1円 = 1）で指定
+                        'unit_amount' => $item->price,
                         'product_data' => [
                             'name' => $item->name,
                         ],
@@ -148,7 +148,7 @@ class PurchaseController extends Controller
 
         } catch (\Stripe\Exception\ApiErrorException $e) {
             DB::rollback(); 
-            return redirect()->back()->withErrors(['stripe_error' => '決済システムでエラーが発生しました。もう一度お試しください。'])->withInput();
+            return redirect()->back()->withInput();
         } catch (\Exception $e) {
             DB::rollback();
             return redirect('/purchase/' . $item->id);
@@ -159,8 +159,6 @@ class PurchaseController extends Controller
     {
         $purchaseId = $request->query('purchase_id');
         $user = Auth::user();
-
-        $addressId = null;
 
         DB::beginTransaction();
         try {

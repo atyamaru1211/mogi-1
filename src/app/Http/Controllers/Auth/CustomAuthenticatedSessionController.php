@@ -3,18 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
 use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Laravel\Fortify\Contracts\FailedPasswordResetLink;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
 
 class CustomAuthenticatedSessionController extends Controller
 {
-    // ログイン処理
     public function store(LoginRequest $request)
     {
         $request->authenticate();
@@ -40,7 +37,6 @@ class CustomAuthenticatedSessionController extends Controller
         return redirect('/');
     }
 
-    // ログアウト処理
     public function destroy(Request $request)
     {
         Auth::guard()->logout();
@@ -52,7 +48,6 @@ class CustomAuthenticatedSessionController extends Controller
         return redirect('/');
     }
 
-    //レートリミット
     protected function ensureIsNotRateLimited()
     {
         if (! Features::enabled(Features::limiter())) {
@@ -74,24 +69,13 @@ class CustomAuthenticatedSessionController extends Controller
         $this->limiter()->hit($this->throttleKey());
     }
 
-    // レートリミットのキー生成
     protected function throttleKey()
     {
         return strtolower($this->username()).'|'.$this->ip();
     }
 
-    // ログインに使用するユーザー名取得
     public function username()
     {
         return Fortify::username();
-    }
-
-    // 
-    protected function rules()
-    {
-        return [
-            Fortify::username() => 'required|string',
-            'password' => 'required|string',
-        ];
     }
 }

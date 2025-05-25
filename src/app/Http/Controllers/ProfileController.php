@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    //マイページ画面表示
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -33,7 +32,6 @@ class ProfileController extends Controller
     }
 
 
-    //プロフィール編集画面表示
     public function edit()
     {
         $user = auth()->user();
@@ -42,7 +40,6 @@ class ProfileController extends Controller
     }
 
 
-    //プロフィール更新処理
     public function update(ProfileRequest $request)
     {
         $user = auth()->user();

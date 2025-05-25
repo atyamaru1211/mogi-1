@@ -168,20 +168,13 @@
     color: #FF5555;
 }
 
-/*プレビュー*/
 .preview-container {
-    /*display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    overflow-x: auto;*/
     width: 100%;
     height: auto;
     overflow: hidden;
 }
 
 .preview-container img {
-    /*max-width: 150px;
-    height: auto;*/
     display: block;
     width: 100%;
     height: auto;

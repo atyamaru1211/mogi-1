@@ -180,19 +180,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const defaultIconPath = '{{ asset('images/star.svg') }}';
                 const likedIconPath = '{{ asset('images/star_after.svg') }}';
 
-                // アイコンの切り替え
                 likeIconObject.setAttribute('data', isLiked ? likedIconPath : defaultIconPath);
 
-                // 'liked' クラスの付与・削除 (CSS でスタイルを調整する場合)
                 if (isLiked) {
                     likeButton.classList.add('liked');
                 } else {
                     likeButton.classList.remove('liked');
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-            });
         });
     }
 });

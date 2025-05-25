@@ -115,11 +115,11 @@
                     </p>
                 </div>
             </section>
-            <form action="/purchase/{{ $item->id }}/checkout" method="POST"> <!---->
+            <form action="/purchase/{{ $item->id }}/checkout" method="POST">
                 @csrf
                 <button class="purchase-button" type="submit">購入する</button>
                 <input type="hidden" name="address_existence" value="exists">
-                <input type="hidden" name="payment_method" value="{{ old('payment_method') }}"><!---->
+                <input type="hidden" name="payment_method" value="{{ old('payment_method') }}">
                 @php
                     $hasShippingAddress = false;
                     if (isset($shippingAddress) && !empty($shippingAddress['address'])) {
@@ -128,7 +128,7 @@
                         $hasShippingAddress = true;
                     }
                 @endphp
-                <input type="hidden" name="purchase_price" value="{{ $item->price }}"><!---->
+                <input type="hidden" name="purchase_price" value="{{ $item->price }}">
             </form>
         </div>
     </div>

@@ -13,8 +13,6 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Fortify\Contracts\RegisterResponse;
 use Laravel\Fortify\Contracts\RegisterViewResponse;
 use Laravel\Fortify\Fortify;
-use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CustomRegisteredUserController extends Controller
 {
@@ -66,32 +64,8 @@ class CustomRegisteredUserController extends Controller
         $user = $creator->create($request->validated());
         event(new Registered($user));
 
+        $request->session()->flash('registered_email', $user->email);
+
         return app(RegisterResponse::class);
-
-        //return redirect('/email/verify/notice');
     }
-        //$user = $creator->create($request->all()); // ★ ユーザーを作成
-        //event(new Registered($user)); // ★ 作成された $user を渡す
-
-        //Auth::login($user);
-
-        /*return new class implements RegisterResponse { // ★ 無名クラスで RegisterResponse を実装
-            public function toResponse($request): SymfonyResponse
-            {
-                return redirect('/email/verify/notice');
-            }
-
-            public function toJsonResponse($request): JsonResponse
-            {
-                return new JsonResponse('', 204);
-            }
-        };*/
-        //return redirect('/email/verify/notice');
-        //return app(RegisterResponse::class);
-
-
-    //protected function registered(Request $request, $user)
-    //{
-    //    return redirect('/email/verify/notice');
-    //}
 }

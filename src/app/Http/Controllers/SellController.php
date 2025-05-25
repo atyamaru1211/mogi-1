@@ -20,7 +20,6 @@ class SellController extends Controller
 
     public function store(ExhibitionRequest $request)
     {
-        //画像の保存
         $imagePath = null;
         $path = null;
 
@@ -40,7 +39,6 @@ class SellController extends Controller
         $item->image_path = $imagePath;
         $item->save();
     
-        //カテゴリーの関連付け
         if ($request->has('category')) {
             $item->categories()->attach($request->input('category'));
         }

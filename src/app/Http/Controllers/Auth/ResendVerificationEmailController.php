@@ -16,24 +16,25 @@ class ResendVerificationEmailController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user && !$user->hasVerifiedEmail()) {
-            if (RateLimiter::tooManyAttempts($request->throttleKey(), 6)) {
-                return $this->sendLockoutResponse($request);
+            $throttleKey = $this->throttleKey($request);
+            if (RateLimiter::tooManyAttempts($throttleKey, 6)) {
+                return $this->sendLockoutResponse($request, $throttleKey);
             }
 
             $user->sendEmailVerificationNotification();
 
-            RateLimiter::hit($request->throttleKey());
+            RateLimiter::hit($throttleKey);
 
-            return response()->json(['status' => 'verification-link-sent']);
+            return redirect()->back();
         }
 
-        return response()->json(['status' => 'requires-verification'], 403);
+        return redirect()->back();
     }
 
 
-    protected function sendLockoutResponse(Request $request)
+    protected function sendLockoutResponse(Request $request, string $throttleKey)
     {
-        $seconds = RateLimiter::availableIn($request->throttleKey());
+        $seconds = RateLimiter::availableIn($throttleKey);
 
         return response()->json(['message' => __('Too many verification attempts. Please try again in :seconds seconds.', ['seconds' => $seconds])], 429);
     }

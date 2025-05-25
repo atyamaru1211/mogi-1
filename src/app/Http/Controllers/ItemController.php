@@ -6,24 +6,25 @@ use Illuminate\Http\Request;
 use App\Http\Requests\CommentRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Item;
-use App\Models\Like;
 use App\Models\Comment;
+use Stripe\Stripe;
+use Stripe\Checkout\Session;
+use Illuminate\Support\Facades\DB;
+use App\Models\Address;
+use App\Models\Purchase;
 
 class ItemController extends Controller
 {
-    //商品一覧画面の表示
     public function index(Request $request)
     {
         $query = Item::query();
         $keyword = $request->keyword;
         $tab = $request->query('tab');
 
-        //自身の出品商品を除外
         if (Auth::check()) {
             $query->where('user_id', '!=', Auth::id());
         }
 
-        //マイリスト表示処理
         if (Auth::check() && $request->query('tab') === 'mylist') {
             $likedItemIds = Auth::user()->likes()->pluck('item_id');
             $query->whereIn('id', $likedItemIds);
@@ -39,7 +40,6 @@ class ItemController extends Controller
             return view('item/index', compact('items'));
         }
 
-        //検索機能
         elseif (!empty($request->keyword)) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->keyword . '%');
@@ -54,7 +54,6 @@ class ItemController extends Controller
         return view('item/index', compact('items', 'keyword', 'tab'));
     }
 
-    //商品詳細画面の表示
     public function show(Request $request, Item $item)
     {
         $sessionId = $request->get('session_id');
@@ -66,8 +65,7 @@ class ItemController extends Controller
                 $checkoutSession = Session::retrieve($sessionId);
 
                 if ($checkoutSession->payment_status === 'paid') {
-                    // ★ 決済が完了しているので、purchases テーブルにデータを保存する処理を実行
-                    $user = Auth::user(); // 認証済みユーザーを取得
+                    $user = Auth::user(); 
                     if ($user) {
                         DB::beginTransaction();
                         try {
@@ -97,7 +95,7 @@ class ItemController extends Controller
                                 $addressId = $shippingAddress->id;
                             }
 
-                            $paymentMethodType = session('payment_method_type'); // セッションから取得
+                            $paymentMethodType = session('payment_method_type');
 
                             Purchase::create([
                                 'item_id' => $item->id,
@@ -109,10 +107,9 @@ class ItemController extends Controller
                             ]);
 
                             session()->forget('shipping_address');
-                            session()->forget('payment_method_type'); // ★ ここで削除
+                            session()->forget('payment_method_type');
 
                             DB::commit();
-                            // ★ ここでSold表示などの処理を行う
                         } catch (\Exception $e) {
                             DB::rollback();
                         }
@@ -141,7 +138,6 @@ class ItemController extends Controller
         return view('item.show', $data);
     }
 
-    //いいね機能
     public function toggleLike(Request $request, Item $item)
     {
         $user = Auth::user();
@@ -156,7 +152,6 @@ class ItemController extends Controller
         return response()->json(['liked' => !$liked, 'like_count' => $item->likes()->count()]);
     }
 
-    //コメント機能
     public function store(CommentRequest $request, Item $item)
     {
         $comment = new Comment();
@@ -166,6 +161,5 @@ class ItemController extends Controller
         $comment->save();
 
         return redirect("/item/{$item->id}");
-        //return back();
     }
 }

@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait; // ★ 追加
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 
-class User extends Authenticatable implements MustVerifyEmail // ★ implements MustVerifyEmail を追加
+class User extends Authenticatable implements MustVerifyEmail 
 {
-    use HasApiTokens, HasFactory, Notifiable, MustVerifyEmailTrait; // ★ MustVerifyEmailTrait を use
+    use HasApiTokens, HasFactory, Notifiable, MustVerifyEmailTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -45,6 +46,11 @@ class User extends Authenticatable implements MustVerifyEmail // ★ implements 
         'email_verified_at' => 'datetime',
     ];
 
+    public function items()
+    {
+        return $this->hasMany(Item::class);
+    }
+
     public function profile()
     {
         return $this->hasOne(Profile::class);
@@ -68,5 +74,10 @@ class User extends Authenticatable implements MustVerifyEmail // ★ implements 
     public function purchasedItems()
     {
         return $this->belongsToMany(Item::class, 'purchases', 'buyer_id', 'item_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

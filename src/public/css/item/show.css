@@ -97,9 +97,6 @@
     display: block;
     width: 20px;
     height: 20px;
-    /*display: flex;
-    justify-content: center;
-    align-items: center;*/
     pointer-events: auto;
     cursor: pointer;
 }
@@ -128,7 +125,6 @@
     fill: gold;
 }
 
-/*未ログイン時いいねボタン*/
 .like-button:not(.liked) .like-button__link {
     cursor: pointer;
 }
@@ -140,7 +136,6 @@
 .like-button.liked .like-button__count {
     cursor: default;
 }
-
 
 .purchase-button {
     padding: 5px 12px;
@@ -310,6 +305,7 @@
     border-radius: 4px;
     font-size: 15px;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .error-message {

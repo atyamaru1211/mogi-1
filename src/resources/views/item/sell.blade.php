@@ -68,7 +68,7 @@
             <div class="form-group select-group">
                 <label class="form-label" for="condition">商品の状態</label>
                 <select class="form-select" name="condition" id="condition">
-                    <option value="" desabled selected>選択してください</option>
+                    <option value="" disabled selected>選択してください</option>
                     <option value="1" {{ old('condition') == '1' ? 'selected' : '' }}>良好</option>
                     <option value="2" {{ old('condition') == '2' ? 'selected' : '' }}>目立った傷や汚れなし</option>
                     <option value="3" {{ old('condition') == '3' ? 'selected' : '' }}>やや傷や汚れあり</option>
@@ -126,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const imageUpload = document.getElementById('image_upload');
     const imagePreviewList = document.getElementById('image_preview_list');
 
-    // ページ読み込み時にセッションに一時画像があれば表示
     const tempImage = "{{ session('temp_image') }}";
     if (tempImage) {
         const div = document.createElement('div');
@@ -139,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     imageUpload.addEventListener('change', function(event) {
-        initializeFiles(); // 既存のプレビューをクリア
+        initializeFiles();
         const files = event.target.files;
 
         for (let i = 0; i < files.length; i++) {
