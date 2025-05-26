@@ -157,4 +157,27 @@ return [
         ]),
     ],
 
+        /*
+    |--------------------------------------------------------------------------
+    | Fortify Responses
+    |--------------------------------------------------------------------------
+    |
+    | This option configures the responses that are returned by Fortify's
+    | various actions, such as registration, password resets, and email
+    | verification. You may customize these responses to fit your application's
+    | needs.
+    |
+    */
+
+    'redirects' => [
+        'login' => null,
+        'logout' => '/',
+        'password-confirm' => null,
+        'password-reset' => '/login',
+        'register' => '/email/verify/notice',
+        'email-verification' => null,
+        'password-set' => null,
+    ],
+
+
 ];
