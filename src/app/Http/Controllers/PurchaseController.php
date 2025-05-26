@@ -134,7 +134,7 @@ class PurchaseController extends Controller
             $checkoutParams = [
                 'line_items' => $lineItems,
                 'mode' => 'payment',
-                'success_url' => url('/item/' . $item->id. '/purchased?purchase_id=' . $purchase->id), 
+                'success_url' => url('/item/' . $item->id. '/purchased'), 
             ];
 
             if ($paymentMethod === 'konbini') {
@@ -157,14 +157,15 @@ class PurchaseController extends Controller
 
     public function purchaseSuccess(Request $request, Item $item)
     {
-        $purchaseId = $request->query('purchase_id');
         $user = Auth::user();
 
         DB::beginTransaction();
         try {
-            $purchase = Purchase::find($purchaseId);
+            $purchase = Purchase::where('item_id', $item->id)
+                                ->where('buyer_id', $user->id)
+                                ->first();
 
-            if (!$purchase || $purchase->buyer_id !== $user->id || $purchase->item_id !== $item->id) {
+            if (!$purchase) {
                 DB::rollback();
                 return redirect('/purchase/' . $item->id);
             }

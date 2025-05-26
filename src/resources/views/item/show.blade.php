@@ -78,7 +78,7 @@
             </button>
         </div>
 
-        @if (session('success_sold') || $item->purchases()->exists())
+        @if ($item->purchases()->exists())
         <button class="purchase-button purchase-button--sold" disabled>Sold</button>
         @else
         <a class="purchase-button" href="/purchase/{{ $item->id }}">購入手続きへ</a>

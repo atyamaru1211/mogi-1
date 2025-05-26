@@ -52,12 +52,8 @@ class PurchaseItemTest extends TestCase
         ]);
 
         $response->assertRedirectContains('https://checkout.stripe.com');
-
-        $purchase = Purchase::where('item_id', $item->id)
-                            ->where('buyer_id', $buyer->id)
-                            ->first();
         
-        $responseAfterStripe = $this->actingAs($buyer)->get("/item/{$item->id}/purchased?purchase_id={$purchase->id}");
+        $responseAfterStripe = $this->actingAs($buyer)->get("/item/{$item->id}/purchased");
         $responseAfterStripe->assertRedirect("/item/{$item->id}");
 
         $this->assertDatabaseHas('purchases', [
@@ -108,12 +104,7 @@ class PurchaseItemTest extends TestCase
 
         $response->assertRedirectContains('https://checkout.stripe.com');
 
-        $purchase = Purchase::where('item_id', $item->id)
-                            ->where('buyer_id', $buyer->id)
-                            ->first();
-
-        $responseAfterStripe = $this->actingAs($buyer)->get("/item/{$item->id}/purchased?purchase_id={$purchase->id}");
-
+        $responseAfterStripe = $this->actingAs($buyer)->get("/item/{$item->id}/purchased");
         $responseAfterStripe->assertRedirect("/item/{$item->id}");
 
         $this->assertDatabaseHas('purchases', [
@@ -172,11 +163,7 @@ class PurchaseItemTest extends TestCase
 
         $response->assertRedirectContains('https://checkout.stripe.com');
 
-        $latestPurchase = Purchase::where('item_id', $item->id)
-                                  ->where('buyer_id', $buyer->id)
-                                  ->first();
-
-        $responseAfterStripe = $this->actingAs($buyer)->get("/item/{$item->id}/purchased?purchase_id={$latestPurchase->id}");
+        $responseAfterStripe = $this->actingAs($buyer)->get("/item/{$item->id}/purchased");
         $responseAfterStripe->assertRedirect("/item/{$item->id}");
 
         $this->assertDatabaseHas('purchases', [

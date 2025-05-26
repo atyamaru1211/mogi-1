@@ -31,7 +31,7 @@ class LoginTest extends TestCase
     {
         $response = $this->from('/login')
             ->post('/login', [
-                'email' => 'test@example.com',
+                'email' => 'logintest@example.com',
                 'remember' => 'false',
         ]);
 
@@ -60,14 +60,14 @@ class LoginTest extends TestCase
     {
         $user = User::create([
             'name' => 'テストユーザー',
-            'email' => 'test@example.com',
+            'email' => 'logintest@example.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
 
         $response = $this->from('/login')
             ->post('/login', [
-                'email' => 'test@example.com',
+                'email' => 'logintest@example.com',
                 'password' => 'password',
                 'remember' => 'true',
         ]);
